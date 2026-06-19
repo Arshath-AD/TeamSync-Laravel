@@ -69,15 +69,12 @@ docker compose exec app php artisan db:seed --class=DemoSeeder
 
 ## Default Credentials
 
-After seeding with `DemoSeeder`:
-
 | Name | Email | Password | Role |
 |---|---|---|---|
-| Alex Chen | `admin@teamsync.test` | `password` | Admin |
-| Jordan Lee | `jordan@teamsync.test` | `password` | User |
-| Sam Rivera | `sam@teamsync.test` | `password` | User |
-| Taylor Kim | `taylor@teamsync.test` | `password` | User |
-| Morgan Blake | `morgan@teamsync.test` | `password` | User |
+| Admin User | `admin@apw.local` | `password` | Admin |
+| Test User | `test@example.com` | `password` | User |
+
+> **Note:** Run `php artisan db:seed --class=DemoSeeder` to also load demo users (Alex Chen, Jordan Lee, etc.) with sample projects and tasks.
 
 ---
 
@@ -124,8 +121,4 @@ database/
     └── DemoSeeder.php
 ```
 
----
 
-## License
-
-MIT
