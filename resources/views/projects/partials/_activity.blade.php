@@ -1,0 +1,1 @@
+<x-workspace.activity-card />
