@@ -91,11 +91,23 @@ class ProjectMemberService
             $total = $tasks->count();
             $completed = $tasks->where('status', 'Completed')->count();
             
+            $weighted_workload = $tasks->where('status', '!=', 'Completed')->reduce(function($carry, $task) {
+                $weight = match($task->priority) {
+                    'Critical' => 5,
+                    'High'     => 3,
+                    'Medium'   => 2,
+                    'Low'      => 1,
+                    default    => 2,
+                };
+                return $carry + $weight;
+            }, 0);
+            
             $workload[$member->id] = [
                 'user' => $member,
                 'assigned_tasks' => $total,
                 'active_tasks' => $total - $completed,
                 'completed_tasks' => $completed,
+                'weighted_workload' => $weighted_workload,
             ];
         }
 

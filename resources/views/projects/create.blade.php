@@ -1,37 +1,57 @@
 <x-app-layout>
     <x-slot name="header">New Workspace</x-slot>
 
-    <x-workspace.form-panel title="Create Workspace" description="Set up a new project workspace for your team.">
-        <form action="{{ route('projects.store') }}" method="POST" class="space-y-4">
-            @csrf
-
-            <div>
-                <x-input-label for="project_name" :value="__('Workspace Name')" />
-                <x-text-input id="project_name" class="mt-0.5" type="text" name="project_name" :value="old('project_name')" required autofocus />
-                <x-input-error :messages="$errors->get('project_name')" />
+    <div class="max-w-2xl fade-in">
+        <div class="ts-panel p-5">
+            <div class="mb-4 pb-4" style="border-bottom:1px solid var(--border)">
+                <h2 class="text-sm font-semibold" style="color:var(--text)">Create Workspace</h2>
+                <p class="text-xs mt-0.5" style="color:var(--secondary)">Set up a new project workspace for your team.</p>
             </div>
 
-            <div>
-                <x-input-label for="description" :value="__('Description')" />
-                <textarea id="description" name="description" class="ws-textarea mt-0.5" rows="3" placeholder="What is this workspace for?">{{ old('description') }}</textarea>
-                <x-input-error :messages="$errors->get('description')" />
-            </div>
+            <form action="{{ route('projects.store') }}" method="POST" class="space-y-4">
+                @csrf
 
-            <div>
-                <x-input-label for="project_lead_id" :value="__('Project Lead')" />
-                <select id="project_lead_id" name="project_lead_id" class="ws-select mt-0.5" required>
-                    <option value="" disabled>Select lead</option>
-                    @foreach($users as $user)
-                        <option value="{{ $user->id }}" {{ old('project_lead_id', Auth::id()) == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
-                    @endforeach
-                </select>
-                <x-input-error :messages="$errors->get('project_lead_id')" />
-            </div>
+                <div>
+                    <label class="ts-label" for="project_name">Workspace Name</label>
+                    <input id="project_name" type="text" name="project_name"
+                           value="{{ old('project_name') }}"
+                           class="ts-input" required autofocus
+                           placeholder="e.g. Platform Redesign">
+                    @error('project_name')
+                        <p class="mt-1 text-[11px]" style="color:var(--danger)">{{ $message }}</p>
+                    @enderror
+                </div>
 
-            <div class="ws-form-actions">
-                <a href="{{ route('projects.index') }}" class="ws-link-muted">Cancel</a>
-                <x-primary-button>Create Workspace</x-primary-button>
-            </div>
-        </form>
-    </x-workspace.form-panel>
+                <div>
+                    <label class="ts-label" for="description">Description</label>
+                    <textarea id="description" name="description" class="ts-input" rows="3"
+                              placeholder="What is this workspace for?">{{ old('description') }}</textarea>
+                    @error('description')
+                        <p class="mt-1 text-[11px]" style="color:var(--danger)">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div>
+                    <label class="ts-label" for="project_lead_id">Project Lead</label>
+                    <select id="project_lead_id" name="project_lead_id" class="ts-input" required>
+                        <option value="" disabled>Select lead…</option>
+                        @foreach($users as $user)
+                            <option value="{{ $user->id }}"
+                                {{ old('project_lead_id', Auth::id()) == $user->id ? 'selected' : '' }}>
+                                {{ $user->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('project_lead_id')
+                        <p class="mt-1 text-[11px]" style="color:var(--danger)">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-3" style="border-top:1px solid var(--border)">
+                    <a href="{{ route('projects.index') }}" class="ts-btn-ghost">Cancel</a>
+                    <button type="submit" class="ts-btn-primary">Create Workspace</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </x-app-layout>

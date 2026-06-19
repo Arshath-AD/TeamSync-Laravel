@@ -23,6 +23,7 @@ class Project extends Model
         'project_name',
         'description',
         'project_lead_id',
+        'priority',
     ];
 
     /**

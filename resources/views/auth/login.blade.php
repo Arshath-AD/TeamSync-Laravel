@@ -1,36 +1,76 @@
 <x-guest-layout>
-    <div class="mb-5">
-        <h1 class="text-sm font-semibold text-workspace-text">Sign in to TeamSync</h1>
-        <p class="text-xs text-workspace-secondary mt-0.5">Access your workspace</p>
+    <div class="mb-6">
+        <h1 class="text-sm font-semibold" style="color:var(--text)">Sign in to TeamSync</h1>
+        <p class="text-xs mt-0.5" style="color:var(--secondary)">Access your workspace</p>
     </div>
 
-    <x-auth-session-status class="mb-4 text-xs text-workspace-success" :status="session('status')" />
+    <x-auth-session-status class="mb-4" style="color:var(--accent);font-size:12px" :status="session('status')" />
 
     <form method="POST" action="{{ route('login') }}" class="space-y-4">
         @csrf
 
+        {{-- Email --}}
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input id="email" class="mt-0.5" type="email" name="email" :value="old('email')" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" />
+            <label class="ts-label" for="email">Email</label>
+            <input id="email" type="email" name="email" value="{{ old('email') }}"
+                   class="ts-input" required autofocus autocomplete="username"
+                   placeholder="you@example.com">
+            @error('email')
+                <p class="mt-1 text-[11px]" style="color:var(--danger)">{{ $message }}</p>
+            @enderror
         </div>
 
+        {{-- Password with visibility toggle --}}
         <div>
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input id="password" class="mt-0.5" type="password" name="password" required autocomplete="current-password" />
-            <x-input-error :messages="$errors->get('password')" />
+            <label class="ts-label" for="password">Password</label>
+            <div class="relative">
+                <input id="password" type="password" name="password"
+                       class="ts-input pr-9" required autocomplete="current-password"
+                       placeholder="••••••••">
+                <button type="button" class="pw-toggle-btn" data-pw-toggle="password"
+                        aria-label="Toggle password visibility">
+                    {{-- Eye open --}}
+                    <svg class="eye-open w-4 h-4 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                    </svg>
+                    {{-- Eye closed --}}
+                    <svg class="eye-closed w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                              d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21"/>
+                    </svg>
+                </button>
+            </div>
+            @error('password')
+                <p class="mt-1 text-[11px]" style="color:var(--danger)">{{ $message }}</p>
+            @enderror
         </div>
 
+        {{-- Remember + Forgot --}}
         <div class="flex items-center justify-between">
-            <label for="remember_me" class="inline-flex items-center gap-2">
-                <input id="remember_me" type="checkbox" class="rounded border-workspace-border bg-workspace-background text-workspace-accent focus:ring-workspace-accent" name="remember">
-                <span class="text-xs text-workspace-secondary">{{ __('Remember me') }}</span>
+            <label class="inline-flex items-center gap-2 cursor-pointer">
+                <input id="remember_me" type="checkbox" name="remember"
+                       class="rounded" style="border-color:var(--border);background:var(--elevated);color:var(--accent)">
+                <span class="text-xs" style="color:var(--secondary)">Remember me</span>
             </label>
-            @if (Route::has('password.request'))
-                <a class="text-xs text-workspace-secondary hover:text-workspace-text transition-colors" href="{{ route('password.request') }}">{{ __('Forgot password?') }}</a>
+            @if(Route::has('password.request'))
+                <a href="{{ route('password.request') }}"
+                   class="text-xs transition-colors" style="color:var(--secondary)"
+                   onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--secondary)'">
+                    Forgot password?
+                </a>
             @endif
         </div>
 
-        <x-primary-button class="w-full justify-center">{{ __('Sign In') }}</x-primary-button>
+        {{-- Submit --}}
+        <button type="submit" class="ts-btn-primary w-full justify-center">Sign In</button>
+
+        {{-- Register link --}}
+        <p class="text-center text-xs" style="color:var(--secondary)">
+            No account?
+            <a href="{{ route('register') }}" style="color:var(--accent)" class="font-medium">Create one</a>
+        </p>
     </form>
 </x-guest-layout>

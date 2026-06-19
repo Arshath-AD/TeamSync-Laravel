@@ -1,17 +1,20 @@
 # TeamSync — Laravel Edition
 
-A modern team collaboration and project management web app built with **Laravel 12** and **PHP 8.2**.
+A modern team collaboration and project management web app built with **Laravel 12** and **PHP 8.3**.
 
 ---
 
 ## Features
 
 - **Dashboard** — Role-aware overview with task stats and workforce load distribution
-- **Projects** — Full CRUD with per-project member management
-- **Tasks** — Kanban board view, list view, and personal "My Tasks" view
-- **Task Status** — Inline status updates (Pending → In Progress → Completed)
-- **Role-based Access** — Admin and regular User roles with route-level guards
-- **Auth** — Registration, login, email verification, and profile management via Laravel Breeze
+- **Projects** — Full CRUD with project priorities and workspace views
+- **Tasks** — Kanban board, list view, personal task management, and standalone tasks
+- **Task Status** — Pending, In Progress, On Hold, Completed
+- **Task Priorities** — Low, Medium, High, Critical
+- **Team Management** — Project member assignment and workload tracking
+- **Role-based Access** — Admin and User roles with route-level guards
+- **Authentication** — Registration, login, email verification, profile management
+- **Dockerized Development Environment**
 
 ---
 
@@ -19,7 +22,7 @@ A modern team collaboration and project management web app built with **Laravel 
 
 | Layer | Technology |
 |---|---|
-| Backend | Laravel 12 / PHP 8.2 |
+| Backend | Laravel 12 / PHP 8.3 |
 | Frontend | Blade + Vite + Tailwind CSS |
 | Database | MariaDB / MySQL |
 | Auth | Laravel Breeze |
@@ -72,7 +75,7 @@ docker compose exec app php artisan db:seed --class=DemoSeeder
 | Name | Email | Password | Role |
 |---|---|---|---|
 | Admin User | `admin@apw.local` | `password` | Admin |
-| Test User | `test@example.com` | `password` | User |
+| Test User | `user@apw.local` | `password` | User |
 
 > **Note:** Run `php artisan db:seed --class=DemoSeeder` to also load demo users (Alex Chen, Jordan Lee, etc.) with sample projects and tasks.
 
@@ -121,4 +124,9 @@ database/
     └── DemoSeeder.php
 ```
 
+---
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
 

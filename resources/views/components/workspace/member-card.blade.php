@@ -1,64 +1,65 @@
 @props(['member', 'metrics'])
 
 @php
-    $activeTasks = $metrics['active_tasks'] ?? 0;
-    $completedTasks = $metrics['completed_tasks'] ?? 0;
+    $activeTasks      = $metrics['active_tasks'] ?? 0;
+    $completedTasks   = $metrics['completed_tasks'] ?? 0;
     $assignedProjects = $metrics['assigned_projects'] ?? ($metrics['project_count'] ?? null);
-    $capacityPercentage = min(100, (int) round(($activeTasks / 10) * 100));
+    
+    // Calculate capacity based on weighted workload (fallback to active tasks * 2 if not provided)
+    $weightedWorkload = $metrics['weighted_workload'] ?? $member->weighted_workload ?? ($activeTasks * 2);
+    // Assuming 20 points is 100% capacity (e.g., 4 Critical tasks or 10 Medium tasks)
+    $capacityPct      = min(100, (int) round(($weightedWorkload / 20) * 100));
 
-    $capacityBarClass = match(true) {
-        $capacityPercentage > 80 => 'bg-workspace-danger',
-        $capacityPercentage > 50 => 'bg-workspace-warning',
-        default => 'bg-workspace-success',
-    };
-
-    $availabilityClass = match(true) {
-        $capacityPercentage > 80 => 'text-workspace-danger border-workspace-danger/30 bg-workspace-danger/10',
-        $capacityPercentage > 50 => 'text-workspace-warning border-workspace-warning/30 bg-workspace-warning/10',
-        default => 'text-workspace-success border-workspace-success/30 bg-workspace-success/10',
-    };
-
-    $availabilityLabel = match(true) {
-        $capacityPercentage > 80 => 'Overloaded',
-        $capacityPercentage > 50 => 'Busy',
-        default => 'Available',
+    $barColor   = $capacityPct > 80 ? 'var(--danger)' : ($capacityPct > 50 ? 'var(--warning)' : 'var(--success)');
+    $badgeColor = match(true) {
+        $capacityPct > 80 => ['color' => 'var(--danger)',  'bg' => 'rgba(239,68,68,0.1)',  'border' => 'rgba(239,68,68,0.3)',  'label' => 'Overloaded'],
+        $capacityPct > 50 => ['color' => 'var(--warning)', 'bg' => 'rgba(245,158,11,0.1)', 'border' => 'rgba(245,158,11,0.3)', 'label' => 'Busy'],
+        $activeTasks > 0  => ['color' => 'var(--success)', 'bg' => 'rgba(34,197,94,0.1)',  'border' => 'rgba(34,197,94,0.3)',  'label' => 'Active'],
+        default           => ['color' => 'var(--secondary)','bg'=> 'var(--elevated)',        'border' => 'var(--border)',        'label' => 'Idle'],
     };
 @endphp
 
-<div {{ $attributes->merge(['class' => 'ws-panel p-3 flex flex-col']) }}>
-    <div class="flex items-start gap-2.5 mb-3">
-        <div class="h-8 w-8 rounded bg-workspace-elevated flex items-center justify-center text-workspace-text text-xs font-bold flex-shrink-0 border border-workspace-border">
+<div {{ $attributes->merge(['class' => 'ts-card p-3 flex flex-col gap-3']) }}>
+
+    {{-- Header: avatar + name + status --}}
+    <div class="flex items-center gap-2.5">
+        <div class="ts-avatar w-8 h-8 text-xs flex-shrink-0">
             {{ strtoupper(substr($member->name, 0, 1)) }}
         </div>
         <div class="flex-1 min-w-0">
-            <h4 class="text-xs font-semibold text-workspace-text truncate">{{ $member->name }}</h4>
-            <p class="text-[10px] text-workspace-secondary truncate">{{ ucfirst($member->role ?? 'member') }}</p>
+            <h4 class="text-xs font-semibold truncate" style="color:var(--text)">{{ $member->name }}</h4>
+            <p class="text-[10px] truncate" style="color:var(--secondary)">{{ ucfirst($member->role ?? 'Member') }}</p>
         </div>
-        <span class="ws-badge {{ $availabilityClass }} flex-shrink-0">{{ $availabilityLabel }}</span>
+        <span class="ts-badge flex-shrink-0"
+              style="color:{{ $badgeColor['color'] }};background:{{ $badgeColor['bg'] }};border-color:{{ $badgeColor['border'] }}">
+            {{ $badgeColor['label'] }}
+        </span>
     </div>
 
-    <div class="grid grid-cols-3 gap-1.5 mb-3 text-[10px]">
-        <div class="bg-workspace-elevated rounded px-2 py-1.5 text-center">
-            <div class="text-workspace-secondary">Active</div>
-            <div class="font-semibold text-workspace-text tabular-nums">{{ $activeTasks }}</div>
+    {{-- Stats --}}
+    <div class="grid grid-cols-3 gap-1.5 text-[10px]">
+        <div class="rounded px-2 py-1.5 text-center" style="background:var(--elevated)">
+            <div style="color:var(--secondary)">Active</div>
+            <div class="font-semibold tabular" style="color:var(--text)">{{ $activeTasks }}</div>
         </div>
-        <div class="bg-workspace-elevated rounded px-2 py-1.5 text-center">
-            <div class="text-workspace-secondary">Done</div>
-            <div class="font-semibold text-workspace-success tabular-nums">{{ $completedTasks }}</div>
+        <div class="rounded px-2 py-1.5 text-center" style="background:var(--elevated)">
+            <div style="color:var(--secondary)">Done</div>
+            <div class="font-semibold tabular" style="color:var(--success)">{{ $completedTasks }}</div>
         </div>
-        <div class="bg-workspace-elevated rounded px-2 py-1.5 text-center">
-            <div class="text-workspace-secondary">Projects</div>
-            <div class="font-semibold text-workspace-text tabular-nums">{{ $assignedProjects ?? '—' }}</div>
+        <div class="rounded px-2 py-1.5 text-center" style="background:var(--elevated)">
+            <div style="color:var(--secondary)">Projects</div>
+            <div class="font-semibold tabular" style="color:var(--text)">{{ $assignedProjects ?? '—' }}</div>
         </div>
     </div>
 
+    {{-- Capacity bar --}}
     <div>
-        <div class="flex justify-between text-[9px] text-workspace-secondary mb-1 uppercase tracking-wider">
+        <div class="flex justify-between text-[9px] uppercase tracking-wider mb-1" style="color:var(--secondary)">
             <span>Capacity</span>
-            <span class="tabular-nums">{{ $capacityPercentage }}%</span>
+            <span class="tabular">{{ $capacityPct }}%</span>
         </div>
-        <div class="w-full bg-workspace-elevated rounded-full h-1">
-            <div class="{{ $capacityBarClass }} h-1 rounded-full transition-all" style="width: {{ $capacityPercentage }}%"></div>
+        <div class="ts-progress-track">
+            <div class="ts-progress-fill" style="width:{{ $capacityPct }}%;background:{{ $barColor }}"></div>
         </div>
     </div>
 </div>

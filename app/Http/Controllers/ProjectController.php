@@ -91,6 +91,30 @@ class ProjectController extends Controller
     }
 
     /**
+     * Quick-action: bump project priority up or down one level.
+     * Admin only — enforced in routes via middleware or inline check.
+     */
+    public function updatePriority(Request $request, Project $project)
+    {
+        if (\Illuminate\Support\Facades\Auth::user()->role !== 'admin') {
+            abort(403);
+        }
+
+        $ladder    = ['Low', 'Medium', 'High', 'Critical'];
+        $direction = $request->input('direction'); // 'up' | 'down'
+        $current   = $project->priority ?? 'Medium';
+        $idx       = array_search($current, $ladder);
+
+        if ($direction === 'up' && $idx < count($ladder) - 1) {
+            $project->update(['priority' => $ladder[$idx + 1]]);
+        } elseif ($direction === 'down' && $idx > 0) {
+            $project->update(['priority' => $ladder[$idx - 1]]);
+        }
+
+        return back()->with('success', 'Priority updated to ' . $project->fresh()->priority . '.');
+    }
+
+    /**
      * Remove the specified resource from storage.
      */
     public function destroy(Project $project)

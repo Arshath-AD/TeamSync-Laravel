@@ -1,23 +1,26 @@
-@props(['value', 'label', 'trend' => null, 'statusColor' => 'accent'])
+@props(['value', 'label', 'trend' => null, 'statusColor' => 'accent', 'icon' => null])
 
 @php
-    $borderClass = match($statusColor) {
-        'success' => 'border-t-workspace-success',
-        'warning' => 'border-t-workspace-warning',
-        'danger' => 'border-t-workspace-danger',
-        default => 'border-t-workspace-accent',
+    $accentStyles = match($statusColor) {
+        'success' => ['border' => 'rgba(34,197,94,0.4)',  'text' => 'var(--success)', 'bg' => 'rgba(34,197,94,0.08)'],
+        'warning' => ['border' => 'rgba(245,158,11,0.4)', 'text' => 'var(--warning)', 'bg' => 'rgba(245,158,11,0.08)'],
+        'danger'  => ['border' => 'rgba(239,68,68,0.4)',  'text' => 'var(--danger)',  'bg' => 'rgba(239,68,68,0.08)'],
+        default   => ['border' => 'rgba(26,107,138,0.4)', 'text' => 'var(--accent)',  'bg' => 'rgba(26,107,138,0.08)'],
     };
-    $trendClass = $trend && str_starts_with($trend, '+')
-        ? 'text-workspace-danger'
-        : ($trend && str_starts_with($trend, '-') ? 'text-workspace-success' : 'text-workspace-secondary');
+    $trendClass = $trend && str_starts_with($trend, '+') ? 'var(--danger)' : (
+                  $trend && str_starts_with($trend, '-') ? 'var(--success)' : 'var(--secondary)');
 @endphp
 
-<div {{ $attributes->merge(['class' => "bg-workspace-surface border-t-2 {$borderClass} border-x border-b border-workspace-border rounded-md px-3 py-2.5"]) }}>
-    <div class="flex items-center justify-between gap-2 mb-0.5">
-        <span class="text-[10px] text-workspace-secondary font-medium uppercase tracking-wider truncate">{{ $label }}</span>
+<div {{ $attributes->merge(['class' => 'ts-metric']) }}
+     style="border-top: 2px solid {{ $accentStyles['border'] }}; position:relative; overflow:hidden;">
+    {{-- Subtle bg glow --}}
+    <div style="position:absolute;top:0;right:0;width:48px;height:48px;border-radius:50%;background:{{ $accentStyles['bg'] }};filter:blur(16px);pointer-events:none;"></div>
+
+    <div class="flex items-center justify-between gap-2 mb-1.5 relative">
+        <span class="text-[10px] font-medium uppercase tracking-wider truncate" style="color:var(--secondary)">{{ $label }}</span>
         @if($trend)
-            <span class="text-[10px] {{ $trendClass }} font-medium flex-shrink-0">{{ $trend }}</span>
+            <span class="text-[10px] font-medium flex-shrink-0 ts-badge ts-badge-danger" style="color:{{ $trendClass }}">{{ $trend }}</span>
         @endif
     </div>
-    <div class="text-xl font-bold text-workspace-text tabular-nums leading-none">{{ $value }}</div>
+    <div class="text-2xl font-bold tabular leading-none" style="color:var(--text)">{{ $value }}</div>
 </div>

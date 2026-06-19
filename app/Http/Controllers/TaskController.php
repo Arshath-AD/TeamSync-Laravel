@@ -24,10 +24,12 @@ class TaskController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $tasks = $this->taskService->getAllTasks();
-        return view('tasks.index', compact('tasks'));
+        $tasks    = $this->taskService->getAllTasks($request);
+        $projects = \App\Models\Project::orderBy('project_name')->get();
+        $users    = \App\Models\User::orderBy('name')->get();
+        return view('tasks.index', compact('tasks', 'projects', 'users'));
     }
 
     /**
@@ -35,16 +37,15 @@ class TaskController extends Controller
      */
     public function board()
     {
-        $board = $this->taskService->getBoardView();
-        return view('tasks.board', compact('board'));
+        return redirect()->route('tasks.index');
     }
 
     /**
      * Display the authenticated user's tasks dashboard.
      */
-    public function myTasks()
+    public function myTasks(Request $request)
     {
-        $data = $this->taskService->getUserTasks(Auth::user());
+        $data = $this->taskService->getUserTasks(Auth::user(), $request);
         return view('tasks.my_tasks', $data);
     }
 
@@ -65,7 +66,7 @@ class TaskController extends Controller
     {
         $this->taskService->createTask($request->validated());
 
-        return redirect()->route('tasks.board')
+        return redirect()->route('tasks.index')
             ->with('success', 'Task created successfully.');
     }
 
@@ -86,7 +87,7 @@ class TaskController extends Controller
     {
         $this->taskService->updateTask($task, $request->validated());
 
-        return redirect()->route('tasks.board')
+        return redirect()->route('tasks.index')
             ->with('success', 'Task updated successfully.');
     }
 
@@ -96,8 +97,29 @@ class TaskController extends Controller
     public function updateStatus(UpdateTaskStatusRequest $request, Task $task)
     {
         $this->taskService->updateStatus($task, $request->validated('status'));
+        return back()->with('success', 'Status updated.');
+    }
 
-        return back()->with('success', 'Task status updated.');
+    /**
+     * Quick priority change: increase or decrease by one level.
+     */
+    public function updatePriority(Request $request, Task $task)
+    {
+        $direction = $request->input('direction'); // 'up' | 'down'
+
+        if ($direction === 'up') {
+            $result = $this->taskService->increasePriority($task);
+        } elseif ($direction === 'down') {
+            $result = $this->taskService->decreasePriority($task);
+        } else {
+            return back()->with('error', 'Invalid priority direction.');
+        }
+
+        if ($result === false) {
+            return back()->with('error', 'Priority is already at its limit.');
+        }
+
+        return back()->with('success', "Priority changed to {$task->fresh()->priority}.");
     }
 
     /**

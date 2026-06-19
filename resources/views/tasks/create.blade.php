@@ -1,75 +1,110 @@
 <x-app-layout>
     <x-slot name="header">Create Task</x-slot>
 
-    <x-workspace.form-panel title="New Task" description="Add a task to a workspace and assign it to a team member.">
-        <form action="{{ route('tasks.store') }}" method="POST" class="space-y-4">
-            @csrf
-
-            <div>
-                <x-input-label for="task_name" :value="__('Task Name')" />
-                <x-text-input id="task_name" class="mt-0.5" type="text" name="task_name" :value="old('task_name')" required autofocus />
-                <x-input-error :messages="$errors->get('task_name')" />
+    <div class="max-w-2xl fade-in">
+        <div class="ts-panel p-5">
+            <div class="mb-4 pb-4" style="border-bottom:1px solid var(--border)">
+                <h2 class="text-sm font-semibold" style="color:var(--text)">New Task</h2>
+                <p class="text-xs mt-0.5" style="color:var(--secondary)">Add a task to a workspace and assign it to a team member.</p>
             </div>
 
-            <div>
-                <x-input-label for="description" :value="__('Description')" />
-                <textarea id="description" name="description" class="ws-textarea mt-0.5" rows="3">{{ old('description') }}</textarea>
-                <x-input-error :messages="$errors->get('description')" />
-            </div>
+            <form action="{{ route('tasks.store') }}" method="POST" class="space-y-4">
+                @csrf
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {{-- Task name --}}
                 <div>
-                    <x-input-label for="project_id" :value="__('Workspace')" />
-                    <select id="project_id" name="project_id" class="ws-select mt-0.5" required>
-                        <option value="" disabled selected>Select workspace</option>
-                        @foreach($projects as $project)
-                            <option value="{{ $project->id }}" {{ old('project_id', request('project_id')) == $project->id ? 'selected' : '' }}>{{ $project->project_name }}</option>
-                        @endforeach
-                    </select>
-                    <x-input-error :messages="$errors->get('project_id')" />
+                    <label class="ts-label" for="task_name">Task Name</label>
+                    <input id="task_name" type="text" name="task_name" value="{{ old('task_name') }}"
+                           class="ts-input" required autofocus placeholder="e.g. Implement auth flow">
+                    @error('task_name')
+                        <p class="mt-1 text-[11px]" style="color:var(--danger)">{{ $message }}</p>
+                    @enderror
                 </div>
-                <div>
-                    <x-input-label for="assigned_to" :value="__('Assign To')" />
-                    <select id="assigned_to" name="assigned_to" class="ws-select mt-0.5" required>
-                        <option value="" disabled selected>Select member</option>
-                        @foreach($users as $user)
-                            <option value="{{ $user->id }}" {{ old('assigned_to') == $user->id ? 'selected' : '' }}>{{ $user->name }}</option>
-                        @endforeach
-                    </select>
-                    <x-input-error :messages="$errors->get('assigned_to')" />
-                </div>
-            </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
+                {{-- Description --}}
                 <div>
-                    <x-input-label for="status" :value="__('Status')" />
-                    <select id="status" name="status" class="ws-select mt-0.5" required>
-                        @foreach(['Pending', 'In Progress', 'Completed'] as $status)
-                            <option value="{{ $status }}" {{ old('status', 'Pending') == $status ? 'selected' : '' }}>{{ $status }}</option>
-                        @endforeach
-                    </select>
-                    <x-input-error :messages="$errors->get('status')" />
+                    <label class="ts-label" for="description">Description</label>
+                    <textarea id="description" name="description" class="ts-input" rows="3"
+                              placeholder="What needs to be done?">{{ old('description') }}</textarea>
+                    @error('description')
+                        <p class="mt-1 text-[11px]" style="color:var(--danger)">{{ $message }}</p>
+                    @enderror
                 </div>
-                <div>
-                    <x-input-label for="priority" :value="__('Priority')" />
-                    <select id="priority" name="priority" class="ws-select mt-0.5" required>
-                        @foreach(['Low', 'Medium', 'High', 'Critical'] as $priority)
-                            <option value="{{ $priority }}" {{ old('priority', 'Medium') == $priority ? 'selected' : '' }}>{{ $priority }}</option>
-                        @endforeach
-                    </select>
-                    <x-input-error :messages="$errors->get('priority')" />
-                </div>
-                <div>
-                    <x-input-label for="deadline" :value="__('Deadline')" />
-                    <x-text-input id="deadline" class="mt-0.5" type="date" name="deadline" :value="old('deadline')" required />
-                    <x-input-error :messages="$errors->get('deadline')" />
-                </div>
-            </div>
 
-            <div class="ws-form-actions">
-                <a href="{{ url()->previous() }}" class="ws-link-muted">Cancel</a>
-                <x-primary-button>Create Task</x-primary-button>
-            </div>
-        </form>
-    </x-workspace.form-panel>
+                {{-- Workspace + Assignee --}}
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="ts-label" for="project_id">Workspace</label>
+                        <select id="project_id" name="project_id" class="ts-input">
+                            <option value="">No Project</option>
+                            @foreach($projects as $project)
+                                <option value="{{ $project->id }}"
+                                    {{ old('project_id', request('project_id')) == $project->id ? 'selected' : '' }}>
+                                    {{ $project->project_name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('project_id')
+                            <p class="mt-1 text-[11px]" style="color:var(--danger)">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="ts-label" for="assigned_to">Assign To</label>
+                        <select id="assigned_to" name="assigned_to" class="ts-input" required>
+                            <option value="" disabled selected>Select member…</option>
+                            @foreach($users as $user)
+                                <option value="{{ $user->id }}"
+                                    {{ old('assigned_to') == $user->id ? 'selected' : '' }}>
+                                    {{ $user->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('assigned_to')
+                            <p class="mt-1 text-[11px]" style="color:var(--danger)">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                {{-- Status + Priority + Deadline --}}
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div>
+                        <label class="ts-label" for="status">Status</label>
+                        <select id="status" name="status" class="ts-input" required>
+                            @foreach(['Pending', 'In Progress', 'On Hold', 'Completed'] as $s)
+                                <option value="{{ $s }}" {{ old('status', 'Pending') === $s ? 'selected' : '' }}>{{ $s }}</option>
+                            @endforeach
+                        </select>
+                        @error('status')
+                            <p class="mt-1 text-[11px]" style="color:var(--danger)">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="ts-label" for="priority">Priority</label>
+                        <select id="priority" name="priority" class="ts-input" required>
+                            @foreach(['Low', 'Medium', 'High', 'Critical'] as $p)
+                                <option value="{{ $p }}" {{ old('priority', 'Medium') === $p ? 'selected' : '' }}>{{ $p }}</option>
+                            @endforeach
+                        </select>
+                        @error('priority')
+                            <p class="mt-1 text-[11px]" style="color:var(--danger)">{{ $message }}</p>
+                        @enderror
+                    </div>
+                    <div>
+                        <label class="ts-label" for="deadline">Deadline</label>
+                        <input id="deadline" type="date" name="deadline" class="ts-input"
+                               value="{{ old('deadline') }}" required>
+                        @error('deadline')
+                            <p class="mt-1 text-[11px]" style="color:var(--danger)">{{ $message }}</p>
+                        @enderror
+                    </div>
+                </div>
+
+                {{-- Actions --}}
+                <div class="flex items-center justify-end gap-3 pt-3" style="border-top:1px solid var(--border)">
+                    <a href="{{ url()->previous() }}" class="ts-btn-ghost">Cancel</a>
+                    <button type="submit" class="ts-btn-primary">Create Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </x-app-layout>

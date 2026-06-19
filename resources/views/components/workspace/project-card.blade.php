@@ -5,8 +5,8 @@
     $activeTasks = $metrics['active_tasks'] ?? ($metrics['task_count'] - $metrics['completed_task_count']);
 
     $hasOverdueTasks = $project->relationLoaded('tasks')
-        ? $project->tasks->contains(fn($t) => $t->status !== 'Completed' && $t->deadline && \Carbon\Carbon::parse($t->deadline)->isBefore(now()->startOfDay()))
-        : $project->tasks()->where('status', '!=', 'Completed')->whereNotNull('deadline')->whereDate('deadline', '<', now())->exists();
+        ? $project->tasks->contains(fn($t) => !in_array($t->status, ['Completed', 'On Hold']) && $t->deadline && \Carbon\Carbon::parse($t->deadline)->isBefore(now()->startOfDay()))
+        : $project->tasks()->whereNotIn('status', ['Completed', 'On Hold'])->whereNotNull('deadline')->whereDate('deadline', '<', now())->exists();
 
     $riskLevel = match(true) {
         $hasOverdueTasks => 'critical',
@@ -15,25 +15,20 @@
         default => 'low',
     };
 
-    $riskDotClass = match($riskLevel) {
-        'critical' => 'bg-workspace-danger',
-        'high' => 'bg-workspace-warning',
-        'medium' => 'bg-workspace-warning/70',
-        default => 'bg-workspace-success',
+    $riskStyle = match($riskLevel) {
+        'critical' => ['color' => 'var(--danger)',  'bg' => 'rgba(239,68,68,0.1)',  'border' => 'rgba(239,68,68,0.3)',  'label' => 'At Risk'],
+        'high'     => ['color' => 'var(--warning)', 'bg' => 'rgba(245,158,11,0.1)', 'border' => 'rgba(245,158,11,0.3)', 'label' => 'High Load'],
+        'medium'   => ['color' => 'var(--warning)', 'bg' => 'rgba(245,158,11,0.06)','border' => 'rgba(245,158,11,0.2)', 'label' => 'Behind'],
+        default    => ['color' => 'var(--success)',  'bg' => 'rgba(34,197,94,0.08)', 'border' => 'rgba(34,197,94,0.3)',  'label' => 'On Track'],
     };
 
-    $riskLabel = match($riskLevel) {
-        'critical' => 'At Risk',
-        'high' => 'High Load',
-        'medium' => 'Behind',
-        default => 'On Track',
-    };
-
-    $riskBadgeClass = match($riskLevel) {
-        'critical' => 'text-workspace-danger border-workspace-danger/30 bg-workspace-danger/10',
-        'high' => 'text-workspace-warning border-workspace-warning/30 bg-workspace-warning/10',
-        'medium' => 'text-workspace-warning border-workspace-warning/20 bg-workspace-warning/5',
-        default => 'text-workspace-success border-workspace-success/30 bg-workspace-success/10',
+    // Project priority badge
+    $priority = $project->priority ?? 'Medium';
+    $priorityStyle = match($priority) {
+        'Critical' => ['color' => 'var(--danger)',  'bg' => 'rgba(239,68,68,0.1)',  'border' => 'rgba(239,68,68,0.3)'],
+        'High'     => ['color' => 'var(--warning)', 'bg' => 'rgba(245,158,11,0.1)', 'border' => 'rgba(245,158,11,0.3)'],
+        'Medium'   => ['color' => 'var(--accent)',  'bg' => 'rgba(26,107,138,0.1)', 'border' => 'rgba(26,107,138,0.3)'],
+        default    => ['color' => 'var(--success)', 'bg' => 'rgba(34,197,94,0.08)', 'border' => 'rgba(34,197,94,0.3)'],
     };
 
     $deadline = $project->deadline ?? $project->end_date ?? null;
@@ -41,43 +36,60 @@
         $nextDeadline = $project->tasks->where('status', '!=', 'Completed')->whereNotNull('deadline')->sortBy('deadline')->first();
         $deadline = $nextDeadline?->deadline;
     }
+    $pct = $metrics['completion_percentage'];
+    $barColor = $pct >= 80 ? 'var(--success)' : ($pct >= 40 ? 'var(--accent)' : 'var(--warning)');
 @endphp
 
-<a href="{{ $url }}" class="block ws-panel p-3 hover:border-workspace-accent/60 transition-all group">
+<a href="{{ $url }}" class="ts-card block p-3 hover-lift" style="text-decoration:none;">
+    {{-- Header row: name + health badge --}}
     <div class="flex items-start justify-between gap-2 mb-2">
         <div class="min-w-0 flex-1">
-            <h3 class="text-sm font-semibold text-workspace-text group-hover:text-workspace-accent truncate leading-tight">{{ $project->project_name }}</h3>
+            <h3 class="text-sm font-semibold leading-tight truncate transition-colors"
+                style="color:var(--text)"
+                onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--text)'">
+                {{ $project->project_name }}
+            </h3>
             @if($project->lead ?? null)
-                <p class="text-[10px] text-workspace-secondary mt-0.5 truncate">{{ $project->lead->name }}</p>
+                <p class="text-[10px] mt-0.5 truncate" style="color:var(--secondary)">
+                    {{ $project->lead->name }}
+                </p>
             @endif
         </div>
-        <div class="flex items-center gap-1.5 flex-shrink-0">
-            <span class="ws-badge {{ $riskBadgeClass }}">{{ $riskLabel }}</span>
-            <div class="h-2 w-2 rounded-full {{ $riskDotClass }}" title="Health indicator"></div>
-        </div>
+        <span class="ts-badge flex-shrink-0"
+              style="color:{{ $riskStyle['color'] }};background:{{ $riskStyle['bg'] }};border-color:{{ $riskStyle['border'] }}">
+            {{ $riskStyle['label'] }}
+        </span>
     </div>
 
-    <div class="grid grid-cols-3 gap-2 mb-2.5 text-[10px]">
-        <div class="bg-workspace-elevated rounded px-2 py-1.5 text-center">
-            <div class="text-workspace-secondary">Progress</div>
-            <div class="font-semibold text-workspace-text tabular-nums">{{ $metrics['completion_percentage'] }}%</div>
-        </div>
-        <div class="bg-workspace-elevated rounded px-2 py-1.5 text-center">
-            <div class="text-workspace-secondary">Active</div>
-            <div class="font-semibold text-workspace-text tabular-nums">{{ $activeTasks }}</div>
-        </div>
-        <div class="bg-workspace-elevated rounded px-2 py-1.5 text-center">
-            <div class="text-workspace-secondary">Team</div>
-            <div class="font-semibold text-workspace-text tabular-nums">{{ $metrics['member_count'] }}</div>
-        </div>
+    {{-- Priority badge --}}
+    <div class="mb-2.5">
+        <span class="ts-badge"
+              style="color:{{ $priorityStyle['color'] }};background:{{ $priorityStyle['bg'] }};border-color:{{ $priorityStyle['border'] }}">
+            {{ $priority }}
+        </span>
     </div>
 
+    {{-- Stats --}}
+    <div class="grid grid-cols-3 gap-1.5 mb-3">
+        @foreach([
+            ['label' => 'Progress', 'value' => $pct . '%', 'color' => $barColor],
+            ['label' => 'Active',   'value' => $activeTasks, 'color' => 'var(--text)'],
+            ['label' => 'Team',     'value' => $metrics['member_count'], 'color' => 'var(--text)'],
+        ] as $stat)
+            <div class="rounded px-2 py-1.5 text-center text-[10px]" style="background:var(--elevated);">
+                <div style="color:var(--secondary)">{{ $stat['label'] }}</div>
+                <div class="font-semibold tabular" style="color:{{ $stat['color'] }}">{{ $stat['value'] }}</div>
+            </div>
+        @endforeach
+    </div>
+
+    {{-- Progress bar + deadline --}}
     <div class="flex items-center gap-2">
-        <div class="flex-1 bg-workspace-elevated rounded-full h-1">
-            <div class="bg-workspace-accent h-1 rounded-full transition-all" style="width: {{ $metrics['completion_percentage'] }}%"></div>
+        <div class="ts-progress-track flex-1">
+            <div class="ts-progress-fill" style="width:{{ $pct }}%;background:{{ $barColor }}"></div>
         </div>
         @if($deadline)
-            <span class="text-[10px] text-workspace-secondary flex-shrink-0">
+            <span class="text-[10px] flex-shrink-0" style="color:var(--secondary)">
                 {{ \Carbon\Carbon::parse($deadline)->format('M j') }}
             </span>
         @endif

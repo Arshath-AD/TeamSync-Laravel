@@ -1,128 +1,571 @@
+/* ─── Google Fonts (must precede @tailwind directives) ─────────────────────── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+
+/* ─── Base ─────────────────────────────────────────────────────────────────── */
 @layer base {
-    html, body {
-        @apply bg-workspace-background text-workspace-text antialiased;
+    *, *::before, *::after { box-sizing: border-box; }
+
+    html {
+        font-family: 'Inter', system-ui, sans-serif;
         font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+        scroll-behavior: smooth;
+    }
+
+    /* Dark theme (default) */
+    html, html.dark {
+        --bg:         #0B0F17;
+        --surface:    #111827;
+        --elevated:   #1A2234;
+        --border:     #1F2D42;
+        --border-sub: #263248;
+        --text:       #F0F4FF;
+        --secondary:  #7A8BA6;
+        --muted:      #3A4F6A;
+        --accent:     #1A6B8A;
+        --accent-hov: #1D7EA3;
+        --accent-dim: rgba(26,107,138,0.15);
+        --success:    #22C55E;
+        --warning:    #F59E0B;
+        --danger:     #EF4444;
+        --glass-bg:   rgba(17,24,39,0.80);
+        --glass-border: rgba(255,255,255,0.07);
+        --scrollbar:  #263042;
+    }
+
+    /* Light theme */
+    html.light {
+        --bg:         #F4F6F9;
+        --surface:    #FFFFFF;
+        --elevated:   #EEF1F6;
+        --border:     #D9DFE8;
+        --border-sub: #C5CEDA;
+        --text:       #0F172A;
+        --secondary:  #5A6880;
+        --muted:      #A0AEBA;
+        --accent:     #1A6B8A;
+        --accent-hov: #1D7EA3;
+        --accent-dim: rgba(26,107,138,0.12);
+        --success:    #16A34A;
+        --warning:    #D97706;
+        --danger:     #DC2626;
+        --glass-bg:   rgba(255,255,255,0.85);
+        --glass-border: rgba(0,0,0,0.08);
+        --scrollbar:  #C5CEDA;
+    }
+
+    body {
+        background: var(--bg);
+        color: var(--text);
+        @apply antialiased;
     }
 }
 
+/* ─── Design Tokens (CSS-var based) ────────────────────────────────────────── */
 @layer components {
-    .ws-section-title {
-        @apply text-xs font-semibold text-workspace-text uppercase tracking-wider;
+
+    /* ── Layout ── */
+    .ts-sidebar {
+        background: var(--glass-bg);
+        border-right: 1px solid var(--glass-border);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
     }
 
-    .ws-section-link {
-        @apply text-[11px] text-workspace-secondary hover:text-workspace-text transition-colors;
+    .ts-topbar {
+        background: var(--glass-bg);
+        border-bottom: 1px solid var(--glass-border);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
     }
 
-    .ws-panel {
-        @apply bg-workspace-surface border border-workspace-border rounded-md;
+    /* ── Panels / Cards ── */
+    .ts-panel {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.3);
     }
 
-    .ws-panel-header {
-        @apply flex items-center justify-between px-3 py-2 border-b border-workspace-border;
+    .ts-panel-glass {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 8px;
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+        box-shadow: 0 4px 24px rgba(0,0,0,0.25);
     }
 
-    .ws-empty-state {
-        @apply p-3 text-center text-xs text-workspace-secondary border border-dashed border-workspace-border rounded-md bg-workspace-surface/50;
+    .ts-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .ts-card:hover {
+        border-color: var(--muted);
+        box-shadow: 0 2px 12px rgba(0,0,0,0.2);
     }
 
-    .ws-btn-primary {
-        @apply inline-flex items-center px-3 py-1.5 bg-workspace-accent border border-transparent rounded text-[11px] font-semibold text-white uppercase tracking-wide hover:bg-indigo-500 transition-colors;
+    /* ── Metric card ── */
+    .ts-metric {
+        background: var(--elevated);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 10px 12px;
     }
 
-    .ws-btn-secondary {
-        @apply inline-flex items-center px-3 py-1.5 bg-workspace-surface border border-workspace-border rounded text-[11px] font-semibold text-workspace-text uppercase tracking-wide hover:bg-workspace-elevated transition-colors;
+    /* ── Buttons ── */
+    .ts-btn {
+        @apply inline-flex items-center gap-1.5 rounded font-medium transition-all duration-150 select-none;
+        font-size: 12px;
+        line-height: 1;
+        padding: 6px 12px;
+        white-space: nowrap;
     }
 
-    .ws-tab {
-        @apply whitespace-nowrap py-2.5 px-1 border-b-2 font-medium text-xs transition-colors;
+    .ts-btn-primary {
+        @apply ts-btn;
+        background: var(--accent);
+        color: #fff;
+        border: 1px solid transparent;
+    }
+    .ts-btn-primary:hover { background: var(--accent-hov); }
+
+    .ts-btn-secondary {
+        @apply ts-btn;
+        background: var(--elevated);
+        color: var(--text);
+        border: 1px solid var(--border);
+    }
+    .ts-btn-secondary:hover { border-color: var(--muted); }
+
+    .ts-btn-ghost {
+        @apply ts-btn;
+        background: transparent;
+        color: var(--secondary);
+        border: 1px solid transparent;
+    }
+    .ts-btn-ghost:hover {
+        background: var(--elevated);
+        color: var(--text);
     }
 
-    .ws-tab-active {
-        @apply border-workspace-accent text-workspace-accent;
+    .ts-btn-danger {
+        @apply ts-btn;
+        background: transparent;
+        color: var(--danger);
+        border: 1px solid rgba(239,68,68,0.3);
+    }
+    .ts-btn-danger:hover { background: rgba(239,68,68,0.1); }
+
+    /* ── Inputs ── */
+    .ts-input {
+        display: block;
+        width: 100%;
+        background: var(--elevated);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        color: var(--text);
+        font-size: 13px;
+        padding: 7px 10px;
+        outline: none;
+        transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .ts-input::placeholder { color: var(--secondary); opacity: 0.6; }
+    .ts-input:focus {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px var(--accent-dim);
+    }
+    textarea.ts-input { resize: vertical; min-height: 80px; }
+    select.ts-input { cursor: pointer; }
+
+    /* ── Labels ── */
+    .ts-label {
+        display: block;
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--secondary);
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        margin-bottom: 4px;
     }
 
-    .ws-tab-inactive {
-        @apply border-transparent text-workspace-secondary hover:text-workspace-text hover:border-workspace-border;
+    /* ── Section headers ── */
+    .ts-section-title {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--secondary);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
     }
 
-    .ws-badge {
-        @apply inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium border;
+    .ts-section-link {
+        font-size: 11px;
+        color: var(--secondary);
+        transition: color 0.15s;
+    }
+    .ts-section-link:hover { color: var(--text); }
+
+    /* ── Navigation items ── */
+    .ts-nav-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--secondary);
+        transition: background 0.12s, color 0.12s;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    .ts-nav-item:hover {
+        background: var(--elevated);
+        color: var(--text);
+    }
+    .ts-nav-item.active {
+        background: var(--accent-dim);
+        color: var(--accent);
+        border: 1px solid rgba(26,107,138,0.25);
+    }
+    .ts-nav-item.active svg { color: var(--accent); }
+
+    /* ── Tabs ── */
+    .ts-tab {
+        padding: 8px 4px;
+        font-size: 12px;
+        font-weight: 500;
+        border-bottom: 2px solid transparent;
+        color: var(--secondary);
+        transition: color 0.15s, border-color 0.15s;
+        white-space: nowrap;
+        cursor: pointer;
+        text-decoration: none;
+    }
+    .ts-tab:hover { color: var(--text); }
+    .ts-tab.active {
+        color: var(--accent);
+        border-bottom-color: var(--accent);
     }
 
-    .ws-kanban-column {
-        @apply flex-shrink-0 w-72 flex flex-col bg-workspace-elevated rounded-md border border-workspace-border;
+    /* ── Badges ── */
+    .ts-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-size: 10px;
+        font-weight: 500;
+        border: 1px solid;
     }
 
-    .ws-kanban-header {
-        @apply px-3 py-2 border-b border-workspace-border flex justify-between items-center;
+    .ts-badge-success { color: var(--success); border-color: rgba(34,197,94,0.3); background: rgba(34,197,94,0.1); }
+    .ts-badge-warning { color: var(--warning); border-color: rgba(245,158,11,0.3); background: rgba(245,158,11,0.1); }
+    .ts-badge-danger  { color: var(--danger);  border-color: rgba(239,68,68,0.3);  background: rgba(239,68,68,0.1); }
+    .ts-badge-info    { color: var(--accent);  border-color: rgba(26,107,138,0.3); background: rgba(26,107,138,0.1); }
+    .ts-badge-muted   { color: var(--secondary); border-color: var(--border); background: var(--elevated); }
+
+    /* ── Kanban ── */
+    .ts-kanban-col {
+        flex-shrink: 0;
+        width: 280px;
+        display: flex;
+        flex-direction: column;
+        background: var(--elevated);
+        border: 1px solid var(--border);
+        border-radius: 8px;
     }
 
-    .ws-kanban-body {
-        @apply flex-1 overflow-y-auto p-2 space-y-2 custom-scrollbar max-h-[calc(100vh-220px)];
+    .ts-kanban-header {
+        padding: 10px 12px;
+        border-bottom: 1px solid var(--border);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
 
-    .ws-label {
-        @apply block text-[10px] font-medium text-workspace-secondary uppercase tracking-wider mb-1;
+    .ts-kanban-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        max-height: calc(100vh - 240px);
     }
 
-    .ws-input {
-        @apply block w-full rounded-md bg-workspace-background border-workspace-border text-workspace-text text-sm placeholder:text-workspace-secondary/50 focus:border-workspace-accent focus:ring-workspace-accent py-1.5 px-2.5;
+    /* ── Priority dots ── */
+    .priority-critical { color: var(--danger); }
+    .priority-high     { color: var(--warning); }
+    .priority-medium   { color: var(--accent); }
+    .priority-low      { color: var(--secondary); }
+
+    /* ── Status pill ── */
+    .status-pill {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 2px 7px;
+        border-radius: 20px;
+        font-size: 10px;
+        font-weight: 500;
+    }
+    .status-pending     { background: rgba(122,139,166,0.15); color: var(--secondary); }
+    .status-in-progress { background: rgba(26,107,138,0.15);  color: var(--accent); }
+    .status-on-hold     { background: rgba(245,158,11,0.15);  color: var(--warning); }
+    .status-completed   { background: rgba(34,197,94,0.12);   color: var(--success); }
+
+    /* ── Empty state ── */
+    .ts-empty {
+        padding: 24px 16px;
+        text-align: center;
+        font-size: 12px;
+        color: var(--secondary);
+        border: 1px dashed var(--border);
+        border-radius: 8px;
+        background: var(--elevated);
+        opacity: 0.8;
     }
 
-    .ws-textarea {
-        @apply ws-input resize-y min-h-[80px];
+    /* ── Alert ── */
+    .ts-alert-success {
+        background: rgba(34,197,94,0.08);
+        border: 1px solid rgba(34,197,94,0.3);
+        color: var(--success);
+        border-radius: 6px;
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    .ts-alert-danger {
+        background: rgba(239,68,68,0.08);
+        border: 1px solid rgba(239,68,68,0.3);
+        color: var(--danger);
+        border-radius: 6px;
+        padding: 8px 12px;
+        font-size: 12px;
     }
 
-    .ws-select {
-        @apply ws-input;
+    /* ── Search input ── */
+    .ts-search {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: var(--elevated);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 5px 10px;
+        font-size: 12px;
+        color: var(--secondary);
+        transition: border-color 0.15s, box-shadow 0.15s;
+        cursor: text;
+        min-width: 200px;
     }
+    .ts-search:focus-within {
+        border-color: var(--accent);
+        box-shadow: 0 0 0 2px var(--accent-dim);
+        color: var(--text);
+    }
+    .ts-search input {
+        background: transparent;
+        border: none;
+        outline: none;
+        color: inherit;
+        font-size: 12px;
+        width: 100%;
+    }
+    .ts-search input::placeholder { color: var(--secondary); opacity: 0.7; }
 
-    .ws-form-panel {
-        @apply ws-panel p-4 max-w-2xl;
+    /* ── Toggle group ── */
+    .ts-toggle-group {
+        display: inline-flex;
+        background: var(--elevated);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        overflow: hidden;
     }
-
-    .ws-form-actions {
-        @apply flex items-center justify-end gap-3 pt-4 mt-4 border-t border-workspace-border;
-    }
-
-    .ws-link-muted {
-        @apply text-xs text-workspace-secondary hover:text-workspace-text transition-colors;
-    }
-
-    .ws-link-danger {
-        @apply text-xs text-workspace-danger hover:text-red-400 transition-colors;
-    }
-}
-
-@layer utilities {
-    .custom-scrollbar::-webkit-scrollbar {
-        width: 5px;
-        height: 5px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
+    .ts-toggle-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        padding: 5px 10px;
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--secondary);
+        transition: background 0.12s, color 0.12s;
+        cursor: pointer;
+        border: none;
         background: transparent;
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #263042;
-        border-radius: 10px;
+    .ts-toggle-btn.active {
+        background: var(--accent);
+        color: #fff;
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #94A3B8;
+    .ts-toggle-btn:not(.active):hover {
+        background: var(--border);
+        color: var(--text);
     }
 
-    .board-container::-webkit-scrollbar {
-        height: 6px;
+    /* ── Avatar ── */
+    .ts-avatar {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        font-weight: 700;
+        flex-shrink: 0;
+        font-size: 11px;
+        text-transform: uppercase;
+        background: var(--accent-dim);
+        color: var(--accent);
+        border: 1px solid rgba(26,107,138,0.25);
     }
-    .board-container::-webkit-scrollbar-track {
-        background: #0B0F17;
+
+    /* ── Dropdown (glassmorphism) ── */
+    .ts-dropdown {
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
+        border-radius: 8px;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        min-width: 180px;
+        padding: 4px;
+        z-index: 50;
     }
-    .board-container::-webkit-scrollbar-thumb {
-        background-color: #263042;
+    .ts-dropdown-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 7px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        color: var(--text);
+        cursor: pointer;
+        transition: background 0.12s;
+        text-decoration: none;
+    }
+    .ts-dropdown-item:hover { background: var(--elevated); }
+    .ts-dropdown-item.danger { color: var(--danger); }
+    .ts-dropdown-item.danger:hover { background: rgba(239,68,68,0.1); }
+    .ts-dropdown-divider {
+        height: 1px;
+        background: var(--border);
+        margin: 3px 0;
+    }
+
+    /* ── View toggle persistence ── */
+    .ts-view-toggle-btn { @apply ts-toggle-btn; }
+
+    /* ── Progress bar ── */
+    .ts-progress-track {
+        width: 100%;
+        height: 4px;
+        background: var(--elevated);
         border-radius: 20px;
+        overflow: hidden;
     }
+    .ts-progress-fill {
+        height: 100%;
+        border-radius: 20px;
+        transition: width 0.5s ease;
+    }
+}
+
+/* ─── Scrollbars ────────────────────────────────────────────────────────────── */
+@layer utilities {
+    .ts-scroll::-webkit-scrollbar { width: 4px; height: 4px; }
+    .ts-scroll::-webkit-scrollbar-track { background: transparent; }
+    .ts-scroll::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 10px; }
+    .ts-scroll::-webkit-scrollbar-thumb:hover { background: var(--muted); }
+
+    .board-scroll::-webkit-scrollbar { height: 5px; }
+    .board-scroll::-webkit-scrollbar-track { background: var(--bg); }
+    .board-scroll::-webkit-scrollbar-thumb { background: var(--scrollbar); border-radius: 20px; }
+
+    /* ── Password toggle eye ── */
+    .pw-toggle-btn {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--secondary);
+        cursor: pointer;
+        background: none;
+        border: none;
+        padding: 2px;
+        transition: color 0.15s;
+    }
+    .pw-toggle-btn:hover { color: var(--text); }
+
+    /* ── Theme icon ── */
+    .theme-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--elevated);
+        color: var(--secondary);
+        cursor: pointer;
+        transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .theme-btn:hover {
+        background: var(--border);
+        color: var(--text);
+    }
+
+    /* ── Notification badge placeholder ── */
+    .notif-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--elevated);
+        color: var(--secondary);
+        cursor: pointer;
+        position: relative;
+        transition: background 0.15s, color 0.15s;
+    }
+    .notif-btn:hover { background: var(--border); color: var(--text); }
+    .notif-dot {
+        position: absolute;
+        top: 4px;
+        right: 4px;
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: var(--accent);
+        border: 1px solid var(--bg);
+    }
+
+    /* ── Utility ── */
+    .tabular { font-variant-numeric: tabular-nums; }
+    .text-accent { color: var(--accent); }
+    .text-ts-secondary { color: var(--secondary); }
+    .text-ts-text { color: var(--text); }
+    .bg-elevated { background: var(--elevated); }
+    .bg-surface { background: var(--surface); }
+    .border-ts { border-color: var(--border); }
+
+    /* Animations */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(4px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-in { animation: fadeIn 0.2s ease; }
+
+    /* Hover card lift */
+    .hover-lift { transition: transform 0.15s, box-shadow 0.15s; }
+    .hover-lift:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
 }

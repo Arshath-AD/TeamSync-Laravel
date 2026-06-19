@@ -26,7 +26,7 @@ class DashboardService
         $totalTasks = Task::count();
         $completedTasks = Task::where('status', 'Completed')->count();
         $activeTasks = $totalTasks - $completedTasks;
-        $overdueTasks = Task::where('status', '!=', 'Completed')
+        $overdueTasks = Task::whereNotIn('status', ['Completed', 'On Hold'])
             ->whereNotNull('deadline')
             ->whereDate('deadline', '<', $today)
             ->count();
@@ -41,16 +41,30 @@ class DashboardService
             ->limit(5)
             ->get();
 
-        // Aggregated Capacity Overview using Eloquent withCount to avoid N+1
-        $capacityOverview = User::withCount([
+        // Aggregated Capacity Overview
+        $capacityOverview = User::with(['tasks' => function($query) {
+            $query->where('status', '!=', 'Completed');
+        }])->withCount([
             'tasks as total_tasks',
             'tasks as completed_tasks' => function ($query) {
                 $query->where('status', 'Completed');
             }
         ])->get()->map(function ($user) {
             $user->active_tasks = $user->total_tasks - $user->completed_tasks;
+            
+            $user->weighted_workload = $user->tasks->reduce(function($carry, $task) {
+                $weight = match($task->priority) {
+                    'Critical' => 5,
+                    'High'     => 3,
+                    'Medium'   => 2,
+                    'Low'      => 1,
+                    default    => 2,
+                };
+                return $carry + $weight;
+            }, 0);
+
             return $user;
-        })->sortByDesc('active_tasks')->values();
+        })->sortByDesc('weighted_workload')->values();
 
         return [
             'metrics' => [
@@ -90,7 +104,7 @@ class DashboardService
             ->count();
 
         $overdueTasks = Task::where('assigned_to', $user->id)
-            ->where('status', '!=', 'Completed')
+            ->whereNotIn('status', ['Completed', 'On Hold'])
             ->whereNotNull('deadline')
             ->whereDate('deadline', '<', $today)
             ->count();

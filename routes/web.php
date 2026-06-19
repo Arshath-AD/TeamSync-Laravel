@@ -21,6 +21,7 @@ Route::middleware('auth')->group(function () {
     // Projects Module
     Route::resource('projects', \App\Http\Controllers\ProjectController::class)->except(['show']);
     Route::get('/projects/{project}', [\App\Http\Controllers\ProjectController::class, 'show'])->name('projects.show');
+    Route::patch('/projects/{project}/priority', [\App\Http\Controllers\ProjectController::class, 'updatePriority'])->name('projects.updatePriority');
 
     // Project Members Module
     Route::get('/projects/{project}/members', [\App\Http\Controllers\ProjectMemberController::class, 'index'])->name('projects.members.index');
@@ -31,6 +32,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/tasks/board', [\App\Http\Controllers\TaskController::class, 'board'])->name('tasks.board');
     Route::get('/my-tasks', [\App\Http\Controllers\TaskController::class, 'myTasks'])->name('tasks.myTasks');
     Route::patch('/tasks/{task}/status', [\App\Http\Controllers\TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
+    Route::patch('/tasks/{task}/priority', [\App\Http\Controllers\TaskController::class, 'updatePriority'])->name('tasks.updatePriority');
     Route::resource('tasks', \App\Http\Controllers\TaskController::class)->except(['show']);
 });
 

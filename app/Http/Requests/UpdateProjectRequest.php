@@ -25,6 +25,7 @@ class UpdateProjectRequest extends FormRequest
             'project_name' => ['required', 'string', 'max:100'],
             'description' => ['nullable', 'string'],
             'project_lead_id' => ['required', 'exists:users,id'],
+            'priority' => ['sometimes', 'in:Low,Medium,High,Critical'],
         ];
     }
 }
