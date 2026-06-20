@@ -2,11 +2,10 @@
 <nav class="ts-sidebar w-52 flex flex-col h-full flex-shrink-0 z-20">
 
     {{-- Logo / workspace header --}}
-    <div class="h-11 flex items-center px-3 flex-shrink-0" style="border-bottom:1px solid var(--glass-border)">
-        <a href="{{ route('dashboard') }}" class="flex items-center gap-2 group">
-            <div class="w-6 h-6 rounded flex items-center justify-center text-white font-bold text-[10px] flex-shrink-0"
-                 style="background:var(--accent)">TS</div>
-            <span class="font-semibold text-sm tracking-tight" style="color:var(--text)">TeamSync</span>
+    <div class="ts-sidebar-header h-14 flex items-center px-3 flex-shrink-0" style="border-bottom:1px solid var(--glass-border)">
+        <a href="{{ route('dashboard') }}" class="flex items-center gap-2.5 group w-full overflow-visible" id="sidebar-logo-link">
+            <x-logo class="h-8 w-auto flex-shrink-0" />
+            <span class="font-bold text-[15px] tracking-tight nav-label" style="color:var(--text)">TeamSync</span>
         </a>
     </div>
 
@@ -50,14 +49,14 @@
                 <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     {!! $item['icon'] !!}
                 </svg>
-                {{ $item['label'] }}
+                <span class="nav-label">{{ $item['label'] }}</span>
             </a>
         @endforeach
 
         @if($role === 'admin')
             {{-- Separator --}}
-            <div class="px-2 pt-3 pb-1">
-                <div class="text-[10px] font-semibold uppercase tracking-widest" style="color:var(--muted)">Team</div>
+            <div class="px-2 pt-3 pb-1 nav-text-hide">
+                <div class="text-[10px] font-semibold uppercase tracking-widest nav-label" style="color:var(--muted)">Team</div>
             </div>
 
             <a href="{{ route('dashboard', ['section' => 'members']) }}"
@@ -66,21 +65,47 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                           d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
                 </svg>
-                Resource Directory
+                <span class="nav-label">Resource Directory</span>
             </a>
         @endif
 
     </div>
+    {{-- end nav scroll area --}}
 
-    {{-- Footer --}}
-    <div class="px-3 py-2.5 flex-shrink-0" style="border-top:1px solid var(--glass-border)">
-        <div class="flex items-center gap-2">
-            <div class="ts-avatar w-6 h-6 text-[9px]">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
-            <div class="min-w-0 flex-1">
-                <div class="text-[11px] font-medium truncate" style="color:var(--text)">{{ Auth::user()->name }}</div>
-                <div class="text-[10px] capitalize" style="color:var(--secondary)">{{ Auth::user()->role ?? 'User' }}</div>
+    {{-- Collapse button pinned to bottom --}}
+    <div class="px-2 py-1 flex-shrink-0" style="border-top:1px solid var(--glass-border)">
+        <button onclick="toggleSidebar()" class="ts-nav-item w-full bg-transparent border-none focus:outline-none" style="justify-content: flex-start;">
+            <svg class="w-3.5 h-3.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="18" height="18" x="3" y="3" rx="2" ry="2"/>
+                <line x1="9" x2="9" y1="3" y2="21"/>
+                <path d="m16 15-3-3 3-3"/>
+            </svg>
+            <span class="nav-label">Collapse</span>
+        </button>
+    </div>
+
+    {{-- Unified User Card & Attribution --}}
+    <div class="flex-shrink-0" style="border-top:1px solid var(--glass-border); background:var(--surface)">
+        <a href="{{ route('profile.edit') }}"
+           class="px-3 py-3 flex flex-col gap-3 transition-colors group"
+           onmouseover="this.style.background='var(--elevated)'" onmouseout="this.style.background=''"
+           title="View your profile">
+            
+            <div class="flex items-center gap-2">
+                <img src="{{ Auth::user()->avatarUrl() }}" alt="{{ Auth::user()->name }}"
+                     class="w-7 h-7 rounded-full object-cover flex-shrink-0"
+                     onerror="this.src='{{ asset('images/default-avatar.jpg') }}'">
+                <div class="min-w-0 flex-1 nav-label">
+                    <div class="text-[11px] font-medium truncate" style="color:var(--text)">{{ Auth::user()->name }}</div>
+                    <div class="text-[10px] capitalize" style="color:var(--secondary)">{{ Auth::user()->role ?? 'User' }}</div>
+                </div>
             </div>
-        </div>
+
+            <div class="nav-label text-[9px] flex items-center justify-between" style="color:var(--secondary); opacity: 0.6;">
+                <span>TeamSync v1.0</span>
+                <span>&copy; 2026 Arshath AD</span>
+            </div>
+        </a>
     </div>
 
 </nav>
