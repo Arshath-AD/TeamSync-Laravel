@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ config('app.name', 'TeamSync') }}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo.svg') }}">
     <!-- Theme system: must run synchronously BEFORE any CSS or Vite loads -->
     <script>
         (function () {
@@ -47,12 +48,6 @@
         </button>
     </div>
 
-    {{-- Logo --}}
-    <a href="/" class="flex items-center gap-2.5 mb-7">
-        <div class="w-8 h-8 rounded-lg flex items-center justify-center text-white font-bold text-sm"
-             style="background:var(--accent)">TS</div>
-        <span class="text-lg font-semibold tracking-tight" style="color:var(--text)">TeamSync</span>
-    </a>
 
     {{-- Card --}}
     <div class="ts-panel-glass w-full max-w-sm p-7 fade-in">

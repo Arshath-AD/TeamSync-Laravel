@@ -1,7 +1,10 @@
 <x-guest-layout>
-    <div class="mb-6">
-        <h1 class="text-sm font-semibold" style="color:var(--text)">Create your account</h1>
-        <p class="text-xs mt-0.5" style="color:var(--secondary)">Join your team workspace</p>
+    <div class="mb-8 flex flex-col items-center text-center">
+        <a href="/" class="flex flex-col items-center group">
+            <x-logo class="h-10 w-auto mb-3 transition-transform group-hover:scale-105 duration-300 rounded-xl overflow-hidden shadow-sm" />
+            <h1 class="text-xl font-bold tracking-tight" style="color:var(--text)">TeamSync</h1>
+        </a>
+        <p class="text-sm mt-2" style="color:var(--secondary)">Join your team workspace</p>
     </div>
 
     <form method="POST" action="{{ route('register') }}" class="space-y-4">

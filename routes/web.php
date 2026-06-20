@@ -10,12 +10,13 @@ Route::get('/', function () {
 use App\Http\Controllers\DashboardController;
 
 Route::get('/dashboard', [DashboardController::class, 'index'])
-    ->middleware(['auth', 'verified'])
+    ->middleware(['auth'])
     ->name('dashboard');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::post('/profile/avatar', [ProfileController::class, 'updateAvatar'])->name('profile.avatar');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     // Projects Module
@@ -34,6 +35,9 @@ Route::middleware('auth')->group(function () {
     Route::patch('/tasks/{task}/status', [\App\Http\Controllers\TaskController::class, 'updateStatus'])->name('tasks.updateStatus');
     Route::patch('/tasks/{task}/priority', [\App\Http\Controllers\TaskController::class, 'updatePriority'])->name('tasks.updatePriority');
     Route::resource('tasks', \App\Http\Controllers\TaskController::class)->except(['show']);
+
+    // Users Module
+    Route::resource('users', \App\Http\Controllers\UserController::class)->except(['show']);
 });
 
 require __DIR__.'/auth.php';

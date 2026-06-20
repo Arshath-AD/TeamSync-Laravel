@@ -26,9 +26,9 @@
         --text:       #F0F4FF;
         --secondary:  #7A8BA6;
         --muted:      #3A4F6A;
-        --accent:     #1A6B8A;
-        --accent-hov: #1D7EA3;
-        --accent-dim: rgba(26,107,138,0.15);
+        --accent:     #3B82F6;
+        --accent-hov: #2563EB;
+        --accent-dim: rgba(59,130,246,0.15);
         --success:    #22C55E;
         --warning:    #F59E0B;
         --danger:     #EF4444;
@@ -47,9 +47,9 @@
         --text:       #0F172A;
         --secondary:  #5A6880;
         --muted:      #A0AEBA;
-        --accent:     #1A6B8A;
-        --accent-hov: #1D7EA3;
-        --accent-dim: rgba(26,107,138,0.12);
+        --accent:     #2563EB;
+        --accent-hov: #1D4ED8;
+        --accent-dim: rgba(37,99,235,0.12);
         --success:    #16A34A;
         --warning:    #D97706;
         --danger:     #DC2626;
@@ -74,6 +74,23 @@
         border-right: 1px solid var(--glass-border);
         backdrop-filter: blur(12px);
         -webkit-backdrop-filter: blur(12px);
+        transition: width 0.3s ease;
+    }
+    
+    .sidebar-collapsed .ts-sidebar {
+        width: 3.5rem !important; /* 56px */
+    }
+
+    .sidebar-collapsed .ts-sidebar .nav-label,
+    .sidebar-collapsed .ts-sidebar .nav-text-hide {
+        display: none !important;
+    }
+
+    .sidebar-collapsed .ts-sidebar .ts-sidebar-header {
+        padding: 0 !important;
+    }
+    .sidebar-collapsed .ts-sidebar .ts-sidebar-header a {
+        justify-content: center !important;
     }
 
     .ts-topbar {
@@ -116,7 +133,7 @@
         background: var(--elevated);
         border: 1px solid var(--border);
         border-radius: 6px;
-        padding: 10px 12px;
+        padding: 12px;
     }
 
     /* ── Buttons ── */
@@ -182,7 +199,32 @@
         box-shadow: 0 0 0 2px var(--accent-dim);
     }
     textarea.ts-input { resize: vertical; min-height: 80px; }
-    select.ts-input { cursor: pointer; }
+
+    /* ── Select / Dropdown theming ── */
+    select.ts-input,
+    select[style*="var(--elevated)"] {
+        cursor: pointer;
+        appearance: none;
+        -webkit-appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%237A8BA6' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='M19 9l-7 7-7-7'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 14px 14px;
+        padding-right: 28px;
+    }
+
+    /* Native dropdown option list — themed for dark & light */
+    select option,
+    select.ts-input option {
+        background: var(--surface);
+        color: var(--text);
+        padding: 6px 10px;
+    }
+    select option:checked,
+    select option:hover {
+        background: var(--accent-dim);
+        color: var(--accent);
+    }
 
     /* ── Labels ── */
     .ts-label {
@@ -197,10 +239,10 @@
 
     /* ── Section headers ── */
     .ts-section-title {
-        font-size: 11px;
+        font-size: 14px;
         font-weight: 600;
         color: var(--secondary);
-        letter-spacing: 0.06em;
+        letter-spacing: 0.05em;
         text-transform: uppercase;
     }
 
@@ -220,19 +262,19 @@
         border-radius: 6px;
         font-size: 12px;
         font-weight: 500;
-        color: var(--secondary);
+        color: var(--accent);
         transition: background 0.12s, color 0.12s;
         cursor: pointer;
         text-decoration: none;
     }
     .ts-nav-item:hover {
         background: var(--elevated);
-        color: var(--text);
+        color: var(--accent-hov);
     }
     .ts-nav-item.active {
         background: var(--accent-dim);
         color: var(--accent);
-        border: 1px solid rgba(26,107,138,0.25);
+        border: 1px solid rgba(59,130,246,0.25);
     }
     .ts-nav-item.active svg { color: var(--accent); }
 
@@ -273,17 +315,22 @@
 
     /* ── Kanban ── */
     .ts-kanban-col {
-        flex-shrink: 0;
-        width: 280px;
+        flex: 1;
+        min-width: 280px;
         display: flex;
         flex-direction: column;
         background: var(--elevated);
         border: 1px solid var(--border);
         border-radius: 8px;
     }
+    @media (min-width: 1024px) {
+        .ts-kanban-col {
+            min-width: 220px;
+        }
+    }
 
     .ts-kanban-header {
-        padding: 10px 12px;
+        padding: 12px;
         border-bottom: 1px solid var(--border);
         display: flex;
         justify-content: space-between;
@@ -293,10 +340,10 @@
     .ts-kanban-body {
         flex: 1;
         overflow-y: auto;
-        padding: 8px;
+        padding: 12px;
         display: flex;
         flex-direction: column;
-        gap: 6px;
+        gap: 12px;
         max-height: calc(100vh - 240px);
     }
 
@@ -423,7 +470,7 @@
         text-transform: uppercase;
         background: var(--accent-dim);
         color: var(--accent);
-        border: 1px solid rgba(26,107,138,0.25);
+        border: 1px solid rgba(59,130,246,0.25);
     }
 
     /* ── Dropdown (glassmorphism) ── */

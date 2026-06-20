@@ -126,7 +126,21 @@ database/
 
 ---
 
+## Maintainer
+
+Arshath AD
+
+LinkedIn:
+https://linkedin.com/in/arshathad
+
+GitHub:
+https://github.com/Arshath-AD
+
+Portfolio:
+https://arshath-ad.github.io
+
+---
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
-

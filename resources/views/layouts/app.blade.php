@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ isset($pageTitle) ? $pageTitle . ' — ' : '' }}{{ config('app.name', 'TeamSync') }}</title>
+    <link rel="icon" type="image/svg+xml" href="{{ asset('images/logo.svg') }}">
 
     <!-- Theme system: must run synchronously BEFORE any CSS or Vite loads -->
     <script>
@@ -29,6 +30,17 @@
                 document.querySelectorAll('.icon-moon').forEach(function (el) {
                     el.classList.toggle('hidden', next !== 'light');
                 });
+            };
+            // Apply saved sidebar state
+            var sidebarCollapsed = localStorage.getItem('ts-sidebar-collapsed') === 'true';
+            if (sidebarCollapsed) {
+                document.documentElement.classList.add('sidebar-collapsed');
+            }
+
+            window.toggleSidebar = function () {
+                var root = document.documentElement;
+                var isCollapsed = root.classList.toggle('sidebar-collapsed');
+                localStorage.setItem('ts-sidebar-collapsed', isCollapsed);
             };
         })();
     </script>
@@ -96,7 +108,9 @@
                             class="flex items-center gap-2 px-2 py-1 rounded-md transition-all"
                             style="border:1px solid var(--border);background:var(--elevated);"
                             aria-label="Profile menu">
-                        <div class="ts-avatar w-6 h-6 text-[9px]">{{ strtoupper(substr(Auth::user()->name, 0, 1)) }}</div>
+                        <img src="{{ Auth::user()->avatarUrl() }}" alt="{{ Auth::user()->name }}"
+                             class="w-6 h-6 rounded-full object-cover flex-shrink-0"
+                             onerror="this.src='{{ asset('images/default-avatar.jpg') }}'">
                         <span class="text-[11px] hidden sm:block font-medium" style="color:var(--text)">{{ Auth::user()->name }}</span>
                         <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
@@ -116,6 +130,12 @@
                             </svg>
                             Profile
                         </a>
+                        <button type="button" class="ts-dropdown-item w-full text-left" onclick="window.dispatchEvent(new CustomEvent('open-about'))">
+                            <svg class="w-3.5 h-3.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                            </svg>
+                            About TeamSync
+                        </button>
                         <div class="ts-dropdown-divider"></div>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
@@ -145,6 +165,66 @@
 
             {{ $slot }}
         </main>
+    </div>
+
+    {{-- About TeamSync Modal --}}
+    <div x-data="{ open: false }"
+         @open-about.window="open = true"
+         @keydown.escape.window="open = false"
+         class="relative z-50"
+         style="display: none;"
+         x-show="open">
+        
+        <div x-show="open" x-transition.opacity class="fixed inset-0 bg-black/60 backdrop-blur-sm"></div>
+
+        <div class="fixed inset-0 overflow-y-auto">
+            <div class="flex min-h-full items-center justify-center p-4">
+                <div x-show="open" 
+                     x-transition.scale.origin.bottom
+                     @click.away="open = false"
+                     class="ts-panel w-full max-w-md p-8 overflow-hidden relative fade-in text-center"
+                     style="background:var(--surface)">
+                    
+                    <button @click="open = false" class="absolute top-4 right-4 transition-colors" style="color:var(--secondary)" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--secondary)'">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                    </button>
+
+                    <div class="flex flex-col items-center justify-center mb-6 mt-2">
+                        <x-logo class="h-10 w-auto mb-3 rounded-lg overflow-hidden shadow-sm" />
+                        <h2 class="text-lg font-semibold leading-tight" style="color:var(--text)">TeamSync</h2>
+                        <p class="text-xs mt-1" style="color:var(--secondary)">Version 1.0</p>
+                    </div>
+
+                    <div class="text-sm space-y-1 mb-8">
+                        <p style="color:var(--secondary)">Created and maintained by</p>
+                        <p class="font-medium" style="color:var(--text)">Arshath AD</p>
+                    </div>
+
+                    <div class="w-full h-px mb-6" style="background:var(--border)"></div>
+
+                    <div class="flex items-center justify-center gap-4 mb-6">
+                        <a href="https://linkedin.com/in/arshathad" target="_blank" rel="noopener" class="text-sm font-medium transition-colors hover-lift" style="color:var(--accent)">
+                            LinkedIn
+                        </a>
+                        <span style="color:var(--border)">|</span>
+                        <a href="https://github.com/Arshath-AD" target="_blank" rel="noopener" class="text-sm font-medium transition-colors hover-lift" style="color:var(--accent)">
+                            GitHub
+                        </a>
+                        <span style="color:var(--border)">|</span>
+                        <a href="https://arshath-ad.github.io" target="_blank" rel="noopener" class="text-sm font-medium transition-colors hover-lift" style="color:var(--accent)">
+                            Portfolio
+                        </a>
+                    </div>
+
+                    <div class="w-full h-px mb-6" style="background:var(--border)"></div>
+
+                    <div class="text-[11px] leading-tight" style="color:var(--secondary); opacity: 0.7;">
+                        &copy; 2026 Arshath AD<br>
+                        All Rights Reserved
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 </body>

@@ -23,7 +23,7 @@
     $isDueToday = $task->status !== 'Completed' && $task->status !== 'On Hold' && $task->deadline && \Carbon\Carbon::parse($task->deadline)->isToday();
 @endphp
 
-<div {{ $attributes->merge(['class' => 'ts-card p-2.5 relative group fade-in']) }}
+<div {{ $attributes->merge(['class' => 'ts-card p-3 relative group fade-in']) }}
      style="padding-left:14px;">
     {{-- Priority bar --}}
     <div style="position:absolute;left:0;top:6px;bottom:6px;width:2px;border-radius:4px;background:{{ $priorityBar }};opacity:0.8;"></div>
@@ -36,9 +36,12 @@
             {{ $task->task_name }}
         </a>
         @if($task->assignee)
-            <div class="ts-avatar w-5 h-5 text-[8px] flex-shrink-0" title="{{ $task->assignee->name }}">
-                {{ strtoupper(substr($task->assignee->name, 0, 1)) }}
-            </div>
+            <img src="{{ $task->assignee->avatarUrl() }}"
+                 alt="{{ $task->assignee->name }}"
+                 title="{{ $task->assignee->name }}"
+                 class="w-5 h-5 rounded-full object-cover ring-1 flex-shrink-0"
+                 style="ring-color:var(--border)"
+                 onerror="this.src='{{ asset('images/default-avatar.jpg') }}'">
         @endif
     </div>
 

@@ -28,6 +28,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'avatar',
     ];
 
     /**
@@ -59,6 +60,30 @@ class User extends Authenticatable
     public function getRememberTokenName()
     {
         return '';
+    }
+
+    /**
+     * Get the user's avatar URL. Returns uploaded avatar or the default fallback.
+     */
+    public function avatarUrl(): string
+    {
+        if ($this->avatar) {
+            return \Illuminate\Support\Facades\Storage::url($this->avatar);
+        }
+        return asset('images/default-avatar.jpg');
+    }
+
+    /**
+     * Get initials (up to 2 chars) for the fallback avatar.
+     */
+    public function initials(): string
+    {
+        $parts = explode(' ', trim($this->name));
+        $init  = strtoupper(substr($parts[0], 0, 1));
+        if (count($parts) > 1) {
+            $init .= strtoupper(substr(end($parts), 0, 1));
+        }
+        return $init;
     }
 
     /**
