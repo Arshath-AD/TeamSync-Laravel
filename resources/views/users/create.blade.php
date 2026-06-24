@@ -10,6 +10,12 @@
     </x-slot>
 
     <div class="fade-in max-w-2xl mx-auto">
+        @php
+            $roleOptions = [
+                ['value' => 'user', 'label' => 'User'],
+                ['value' => 'admin', 'label' => 'Admin'],
+            ];
+        @endphp
         <form action="{{ route('users.store') }}" method="POST" class="ts-card p-5 sm:p-6 space-y-5">
             @csrf
 
@@ -38,10 +44,12 @@
 
             <div>
                 <label for="role" class="ts-label">Role</label>
-                <select name="role" id="role" class="ts-input" required>
-                    <option value="user" {{ old('role') === 'user' ? 'selected' : '' }}>User</option>
-                    <option value="admin" {{ old('role') === 'admin' ? 'selected' : '' }}>Admin</option>
-                </select>
+                <x-workspace.dropdown 
+                    name="role" 
+                    id="role" 
+                    :value="old('role', 'user')" 
+                    :options="$roleOptions" 
+                    required="true" />
                 @error('role') <span class="text-xs text-[var(--danger)] mt-1 block">{{ $message }}</span> @enderror
             </div>
 

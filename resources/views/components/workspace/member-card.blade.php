@@ -28,11 +28,7 @@
     {{-- Header: avatar + name + status badge + admin menu --}}
     <div class="flex items-start gap-2.5">
         <div class="flex-shrink-0">
-            <img src="{{ $member->avatarUrl() }}"
-                 alt="{{ $member->name }}"
-                 class="w-8 h-8 rounded-full object-cover ring-1"
-                 style="ring-color:var(--border)"
-                 onerror="this.src='{{ asset('images/default-avatar.jpg') }}'">
+            <x-workspace.avatar :user="$member" sizeClass="w-8 h-8" />
         </div>
         <div class="flex-1 min-w-0">
             <div class="flex items-center gap-1.5 flex-wrap">

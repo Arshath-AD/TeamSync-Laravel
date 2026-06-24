@@ -139,7 +139,7 @@
                     <tr class="transition-colors" style="color:var(--secondary)" onmouseover="this.style.background='var(--elevated)'" onmouseout="this.style.background=''">
                         <td class="px-4 py-3 font-medium" style="color:var(--text)">
                             <div class="flex items-center gap-2">
-                                <div class="ts-avatar w-7 h-7 text-[10px] flex-shrink-0">{{ strtoupper(substr($member->name, 0, 1)) }}</div>
+                                <x-workspace.avatar :user="$member" sizeClass="w-7 h-7" />
                                 {{ $member->name }}
                                 @if($member->id === Auth::id())
                                     <span class="text-[9px] px-1.5 py-0.5 rounded" style="background:var(--accent-dim);color:var(--accent)">You</span>

@@ -65,7 +65,7 @@
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                @foreach($widgets['capacity_overview']->take(6) as $userModel)
+                @foreach($widgets['capacity_overview'] as $userModel)
                     <x-workspace.member-card
                         :member="$userModel"
                         :metrics="[
@@ -78,9 +78,19 @@
             </div>
         </div>
 
-        {{-- Activity Feed --}}
-        <div class="lg:col-span-4">
-            <x-workspace.activity-card />
+        {{-- Recent Completions --}}
+        <div class="lg:col-span-4 space-y-2">
+            <div class="flex justify-between items-center">
+                <h3 class="ts-section-title">Recent Completions</h3>
+                <a href="{{ route('tasks.index') }}" class="ts-section-link">Board →</a>
+            </div>
+            <div class="space-y-1.5 max-h-[360px] overflow-y-auto ts-scroll pr-0.5">
+                @forelse($widgets['recent_completions'] as $task)
+                    <x-workspace.task-card :task="$task" />
+                @empty
+                    <div class="ts-empty">No recent completions.</div>
+                @endforelse
+            </div>
         </div>
     </div>
 

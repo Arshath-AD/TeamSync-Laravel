@@ -6,14 +6,23 @@
         </div>
 
         {{-- Add member --}}
+        @php
+            $userOptions = [];
+            foreach($allUsers as $u) {
+                $userOptions[] = ['value' => $u->id, 'label' => $u->name, 'avatarUser' => $u];
+            }
+        @endphp
         <form action="{{ route('projects.members.store', $project) }}" method="POST" class="flex gap-2 w-full sm:w-auto">
             @csrf
-            <select name="user_id" required class="ts-input w-full sm:w-52 text-xs">
-                <option value="" disabled selected>Add resource…</option>
-                @foreach($allUsers as $u)
-                    <option value="{{ $u->id }}">{{ $u->name }}</option>
-                @endforeach
-            </select>
+            <div class="w-full sm:w-52">
+                <x-workspace.dropdown 
+                    name="user_id" 
+                    id="user_id" 
+                    :value="old('user_id')" 
+                    :options="$userOptions" 
+                    placeholder="Add resource…" 
+                    required="true" />
+            </div>
             <button type="submit" class="ts-btn-primary flex-shrink-0">Assign</button>
         </form>
     </div>

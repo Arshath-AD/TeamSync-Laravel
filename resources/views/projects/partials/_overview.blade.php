@@ -72,9 +72,7 @@
             <div class="ts-panel p-3">
                 <h3 class="ts-section-title mb-3">Details</h3>
                 <div class="flex items-center gap-2 mb-3">
-                    <div class="ts-avatar w-7 h-7 text-[10px]">
-                        {{ strtoupper(substr($project->lead->name ?? '?', 0, 1)) }}
-                    </div>
+                    <x-workspace.avatar :user="$project->lead" sizeClass="w-7 h-7" />
                     <div>
                         <div class="text-xs font-medium" style="color:var(--text)">{{ $project->lead->name ?? 'Unassigned' }}</div>
                         <div class="text-[10px]" style="color:var(--secondary)">Project Lead</div>

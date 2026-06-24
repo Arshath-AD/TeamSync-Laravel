@@ -8,6 +8,20 @@
                 <p class="text-xs mt-0.5" style="color:var(--secondary)">Update workspace details and project lead.</p>
             </div>
 
+            @php
+                $userOptions = [];
+                foreach($users as $u) {
+                    $userOptions[] = ['value' => $u->id, 'label' => $u->name, 'avatarUser' => $u];
+                }
+                
+                $priorityOptions = [
+                    ['value' => 'Low', 'label' => 'Low', 'color' => '#22c55e'],
+                    ['value' => 'Medium', 'label' => 'Medium', 'color' => '#f59e0b'],
+                    ['value' => 'High', 'label' => 'High', 'color' => '#ef4444'],
+                    ['value' => 'Critical', 'label' => 'Critical', 'color' => '#dc2626'],
+                ];
+            @endphp
+
             <form action="{{ route('projects.update', $project) }}" method="POST" class="space-y-4">
                 @csrf @method('PUT')
 
@@ -33,14 +47,12 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="ts-label" for="project_lead_id">Project Lead</label>
-                        <select id="project_lead_id" name="project_lead_id" class="ts-input" required>
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}"
-                                    {{ old('project_lead_id', $project->project_lead_id) == $user->id ? 'selected' : '' }}>
-                                    {{ $user->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <x-workspace.dropdown 
+                            name="project_lead_id" 
+                            id="project_lead_id" 
+                            :value="old('project_lead_id', $project->project_lead_id)" 
+                            :options="$userOptions" 
+                            required="true" />
                         @error('project_lead_id')
                             <p class="mt-1 text-[11px]" style="color:var(--danger)">{{ $message }}</p>
                         @enderror
@@ -49,11 +61,12 @@
                     @if(Auth::user()->role === 'admin')
                         <div>
                             <label class="ts-label" for="priority">Priority</label>
-                            <select id="priority" name="priority" class="ts-input" required>
-                                @foreach(['Low', 'Medium', 'High', 'Critical'] as $p)
-                                    <option value="{{ $p }}" {{ old('priority', $project->priority ?? 'Medium') === $p ? 'selected' : '' }}>{{ $p }}</option>
-                                @endforeach
-                            </select>
+                            <x-workspace.dropdown 
+                                name="priority" 
+                                id="priority" 
+                                :value="old('priority', $project->priority ?? 'Medium')" 
+                                :options="$priorityOptions" 
+                                required="true" />
                             @error('priority')
                                 <p class="mt-1 text-[11px]" style="color:var(--danger)">{{ $message }}</p>
                             @enderror

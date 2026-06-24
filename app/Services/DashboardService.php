@@ -32,7 +32,7 @@ class DashboardService
             ->count();
 
         // Widgets
-        $recentProjects = Project::with('lead')->latest()->limit(5)->get();
+        $recentProjects = Project::with('lead')->latest()->limit(3)->get();
         $upcomingDeadlines = Task::with(['project', 'assignee'])
             ->where('status', '!=', 'Completed')
             ->whereNotNull('deadline')
@@ -64,7 +64,13 @@ class DashboardService
             }, 0);
 
             return $user;
-        })->sortByDesc('weighted_workload')->values();
+        })->sortByDesc('weighted_workload')->take(6)->values();
+
+        $recentCompletions = Task::with(['assignee', 'project'])
+            ->where('status', 'Completed')
+            ->orderBy('updated_at', 'desc')
+            ->limit(5)
+            ->get();
 
         return [
             'metrics' => [
@@ -80,6 +86,7 @@ class DashboardService
                 'recent_projects' => $recentProjects,
                 'upcoming_deadlines' => $upcomingDeadlines,
                 'capacity_overview' => $capacityOverview,
+                'recent_completions' => $recentCompletions,
             ],
         ];
     }

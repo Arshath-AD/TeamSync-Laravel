@@ -36,12 +36,9 @@
             {{ $task->task_name }}
         </a>
         @if($task->assignee)
-            <img src="{{ $task->assignee->avatarUrl() }}"
-                 alt="{{ $task->assignee->name }}"
-                 title="{{ $task->assignee->name }}"
-                 class="w-5 h-5 rounded-full object-cover ring-1 flex-shrink-0"
-                 style="ring-color:var(--border)"
-                 onerror="this.src='{{ asset('images/default-avatar.jpg') }}'">
+            <div title="{{ $task->assignee->name }}">
+                <x-workspace.avatar :user="$task->assignee" sizeClass="w-5 h-5" />
+            </div>
         @endif
     </div>
 
@@ -53,7 +50,7 @@
                 </span>
             @else
                 <span class="ts-badge" style="color:var(--secondary);background:var(--elevated);border-color:var(--border)">
-                    No Project
+                    Standalone
                 </span>
             @endif
             <span class="ts-badge" style="color:{{ $priorityText['color'] }};background:{{ $priorityText['bg'] }};border-color:{{ $priorityText['border'] }}">

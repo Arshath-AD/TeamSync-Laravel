@@ -8,6 +8,13 @@
                 <p class="text-xs mt-0.5" style="color:var(--secondary)">Set up a new project workspace for your team.</p>
             </div>
 
+            @php
+                $userOptions = [];
+                foreach($users as $u) {
+                    $userOptions[] = ['value' => $u->id, 'label' => $u->name, 'avatarUser' => $u];
+                }
+            @endphp
+
             <form action="{{ route('projects.store') }}" method="POST" class="space-y-4">
                 @csrf
 
@@ -33,15 +40,13 @@
 
                 <div>
                     <label class="ts-label" for="project_lead_id">Project Lead</label>
-                    <select id="project_lead_id" name="project_lead_id" class="ts-input" required>
-                        <option value="" disabled>Select lead…</option>
-                        @foreach($users as $user)
-                            <option value="{{ $user->id }}"
-                                {{ old('project_lead_id', Auth::id()) == $user->id ? 'selected' : '' }}>
-                                {{ $user->name }}
-                            </option>
-                        @endforeach
-                    </select>
+                    <x-workspace.dropdown 
+                        name="project_lead_id" 
+                        id="project_lead_id" 
+                        :value="old('project_lead_id', Auth::id())" 
+                        :options="$userOptions" 
+                        placeholder="Select lead…" 
+                        required="true" />
                     @error('project_lead_id')
                         <p class="mt-1 text-[11px]" style="color:var(--danger)">{{ $message }}</p>
                     @enderror

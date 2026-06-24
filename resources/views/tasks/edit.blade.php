@@ -13,12 +13,38 @@
         </div>
     </x-slot>
 
-    <div class="max-w-2xl fade-in">
+    <div class="max-w-2xl mx-auto fade-in">
         <div class="ts-panel p-5">
             <div class="mb-4 pb-4" style="border-bottom:1px solid var(--border)">
                 <h2 class="text-sm font-semibold" style="color:var(--text)">Edit Task</h2>
                 <p class="text-xs mt-0.5" style="color:var(--secondary)">Update task details, assignment, and status.</p>
             </div>
+
+            @php
+                $projectOptions = [['value' => '', 'label' => 'Standalone']];
+                foreach($projects as $p) {
+                    $projectOptions[] = ['value' => $p->id, 'label' => $p->project_name];
+                }
+                
+                $userOptions = [];
+                foreach($users as $u) {
+                    $userOptions[] = ['value' => $u->id, 'label' => $u->name, 'avatarUser' => $u];
+                }
+
+                $statusOptions = [
+                    ['value' => 'Pending', 'label' => 'Pending', 'color' => '#6b7280'],
+                    ['value' => 'In Progress', 'label' => 'In Progress', 'color' => '#3b82f6'],
+                    ['value' => 'On Hold', 'label' => 'On Hold', 'color' => '#f59e0b'],
+                    ['value' => 'Completed', 'label' => 'Completed', 'color' => '#22c55e'],
+                ];
+
+                $priorityOptions = [
+                    ['value' => 'Low', 'label' => 'Low', 'color' => '#22c55e'],
+                    ['value' => 'Medium', 'label' => 'Medium', 'color' => '#f59e0b'],
+                    ['value' => 'High', 'label' => 'High', 'color' => '#ef4444'],
+                    ['value' => 'Critical', 'label' => 'Critical', 'color' => '#dc2626'],
+                ];
+            @endphp
 
             <form action="{{ route('tasks.update', $task) }}" method="POST" class="space-y-4">
                 @csrf @method('PUT')
@@ -45,29 +71,25 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="ts-label" for="project_id">Workspace</label>
-                        <select id="project_id" name="project_id" class="ts-input">
-                            <option value="">No Project</option>
-                            @foreach($projects as $project)
-                                <option value="{{ $project->id }}"
-                                    {{ old('project_id', $task->project_id) == $project->id ? 'selected' : '' }}>
-                                    {{ $project->project_name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <x-workspace.dropdown 
+                            name="project_id" 
+                            id="project_id" 
+                            :value="old('project_id', $task->project_id)" 
+                            :options="$projectOptions" 
+                            placeholder="Standalone" />
                         @error('project_id')
                             <p class="mt-1 text-[11px]" style="color:var(--danger)">{{ $message }}</p>
                         @enderror
                     </div>
                     <div>
                         <label class="ts-label" for="assigned_to">Assign To</label>
-                        <select id="assigned_to" name="assigned_to" class="ts-input" required>
-                            @foreach($users as $user)
-                                <option value="{{ $user->id }}"
-                                    {{ old('assigned_to', $task->assigned_to) == $user->id ? 'selected' : '' }}>
-                                    {{ $user->name }}
-                                </option>
-                            @endforeach
-                        </select>
+                        <x-workspace.dropdown 
+                            name="assigned_to" 
+                            id="assigned_to" 
+                            :value="old('assigned_to', $task->assigned_to)" 
+                            :options="$userOptions" 
+                            placeholder="Select member…" 
+                            required="true" />
                         @error('assigned_to')
                             <p class="mt-1 text-[11px]" style="color:var(--danger)">{{ $message }}</p>
                         @enderror
@@ -77,19 +99,21 @@
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
                         <label class="ts-label" for="status">Status</label>
-                        <select id="status" name="status" class="ts-input" required>
-                            @foreach(['Pending', 'In Progress', 'On Hold', 'Completed'] as $s)
-                                <option value="{{ $s }}" {{ old('status', $task->status) === $s ? 'selected' : '' }}>{{ $s }}</option>
-                            @endforeach
-                        </select>
+                        <x-workspace.dropdown 
+                            name="status" 
+                            id="status" 
+                            :value="old('status', $task->status)" 
+                            :options="$statusOptions" 
+                            required="true" />
                     </div>
                     <div>
                         <label class="ts-label" for="priority">Priority</label>
-                        <select id="priority" name="priority" class="ts-input" required>
-                            @foreach(['Low', 'Medium', 'High', 'Critical'] as $p)
-                                <option value="{{ $p }}" {{ old('priority', $task->priority) === $p ? 'selected' : '' }}>{{ $p }}</option>
-                            @endforeach
-                        </select>
+                        <x-workspace.dropdown 
+                            name="priority" 
+                            id="priority" 
+                            :value="old('priority', $task->priority)" 
+                            :options="$priorityOptions" 
+                            required="true" />
                     </div>
                     <div>
                         <label class="ts-label" for="deadline">Deadline</label>
