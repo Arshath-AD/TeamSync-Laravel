@@ -30,28 +30,18 @@
         </div>
     </x-slot>
 
-    @php
-        $board = [
-            'Todo'        => $tasks->where('status', 'Pending'),
-            'In Progress' => $tasks->where('status', 'In Progress'),
-            'On Hold'     => $tasks->where('status', 'On Hold'),
-            'Completed'   => $tasks->where('status', 'Completed'),
-        ];
-        $overdue = $tasks->filter(fn($t) =>
-            $t->status !== 'Completed' && $t->status !== 'On Hold' && $t->deadline &&
-            \Carbon\Carbon::parse($t->deadline)->isBefore(now()->startOfDay())
-        )->count();
-    @endphp
-
     {{-- KPI strip --}}
     <div class="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
-        <x-workspace.metric-card value="{{ $tasks->count() }}"                                                                     label="Total Tasks" />
-        <x-workspace.metric-card value="{{ $board['Todo']->count() + $board['In Progress']->count() }}" label="Active"            statusColor="accent" />
-        <x-workspace.metric-card value="{{ $board['Completed']->count() }}"                             label="Completed"         statusColor="success" />
-        <x-workspace.metric-card value="{{ $overdue }}"                                                  label="Overdue"
-            statusColor="{{ $overdue > 0 ? 'danger' : 'success' }}"
-            trend="{{ $overdue > 0 ? '⚠ Overdue' : '' }}" />
+        <x-workspace.metric-card value="{{ $stats['total'] }}"                                                                     label="Total Tasks" />
+        <x-workspace.metric-card value="{{ $stats['active'] }}" label="Active"            statusColor="accent" />
+        <x-workspace.metric-card value="{{ $stats['completed'] }}"                             label="Completed"         statusColor="success" />
+        <x-workspace.metric-card value="{{ $stats['overdue'] }}"                                                  label="Overdue"
+            statusColor="{{ $stats['overdue'] > 0 ? 'danger' : 'success' }}"
+            trend="{{ $stats['overdue'] > 0 ? '⚠ Overdue' : '' }}" />
     </div>
+
+    {{-- Filters --}}
+    @include('tasks.partials._filters')
 
     {{-- ── Board view ─────────────────────────────────────────────────── --}}
     <div data-view="board">
@@ -76,7 +66,7 @@
                         </div>
                         <span class="text-[10px] tabular rounded px-1.5 py-0.5"
                               style="background:var(--elevated);border:1px solid var(--border);color:var(--secondary)">
-                            {{ $columnTasks->count() }}
+                            {{ $columnTasks->total() }}
                         </span>
                     </div>
                     <div class="ts-kanban-body ts-scroll">
@@ -86,6 +76,22 @@
                             <div class="ts-empty text-[11px] py-6">Empty</div>
                         @endforelse
                     </div>
+                    {{-- Column Pagination --}}
+                    @if($columnTasks->hasPages())
+                        <div class="px-3 py-2 text-[10px] font-medium flex justify-between items-center" style="border-top:1px solid var(--border);background:var(--elevated)">
+                            @if($columnTasks->onFirstPage())
+                                <span style="color:var(--muted);cursor:not-allowed">&larr; Prev</span>
+                            @else
+                                <a href="{{ $columnTasks->previousPageUrl() }}" style="color:var(--accent)" class="hover:underline transition-all">&larr; Prev</a>
+                            @endif
+                            <span style="color:var(--secondary)">Page {{ $columnTasks->currentPage() }} of {{ $columnTasks->lastPage() }}</span>
+                            @if($columnTasks->hasMorePages())
+                                <a href="{{ $columnTasks->nextPageUrl() }}" style="color:var(--accent)" class="hover:underline transition-all">Next &rarr;</a>
+                            @else
+                                <span style="color:var(--muted);cursor:not-allowed">Next &rarr;</span>
+                            @endif
+                        </div>
+                    @endif
                 </div>
             @endforeach
         </div>

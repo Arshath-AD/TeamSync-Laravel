@@ -108,9 +108,7 @@
                             class="flex items-center gap-2 px-2 py-1 rounded-md transition-all"
                             style="border:1px solid var(--border);background:var(--elevated);"
                             aria-label="Profile menu">
-                        <img src="{{ Auth::user()->avatarUrl() }}" alt="{{ Auth::user()->name }}"
-                             class="w-6 h-6 rounded-full object-cover flex-shrink-0"
-                             onerror="this.src='{{ asset('images/default-avatar.jpg') }}'">
+                        <x-workspace.avatar :user="Auth::user()" sizeClass="w-6 h-6" />
                         <span class="text-[11px] hidden sm:block font-medium" style="color:var(--text)">{{ Auth::user()->name }}</span>
                         <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>

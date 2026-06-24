@@ -92,9 +92,7 @@
            title="View your profile">
             
             <div class="flex items-center gap-2">
-                <img src="{{ Auth::user()->avatarUrl() }}" alt="{{ Auth::user()->name }}"
-                     class="w-7 h-7 rounded-full object-cover flex-shrink-0"
-                     onerror="this.src='{{ asset('images/default-avatar.jpg') }}'">
+                <x-workspace.avatar :user="Auth::user()" sizeClass="w-7 h-7" />
                 <div class="min-w-0 flex-1 nav-label">
                     <div class="text-[11px] font-medium truncate" style="color:var(--text)">{{ Auth::user()->name }}</div>
                     <div class="text-[10px] capitalize" style="color:var(--secondary)">{{ Auth::user()->role ?? 'User' }}</div>

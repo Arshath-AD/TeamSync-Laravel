@@ -2,8 +2,8 @@
 
 <div {{ $attributes->merge(['class' => 'ts-panel h-full flex flex-col min-h-[200px]']) }}>
     <div class="flex items-center justify-between px-3 py-2.5" style="border-bottom:1px solid var(--border)">
-        <span class="ts-section-title">Recent Activity</span>
-        <span class="text-[10px]" style="color:var(--secondary)">Live feed pending</span>
+        <span class="ts-section-title">Recent Completions</span>
+        <span class="text-[10px]" style="color:var(--secondary)">Latest done tasks</span>
     </div>
     <div class="flex-1 p-3 space-y-2">
         @forelse($items as $item)
@@ -22,8 +22,8 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/>
                     </svg>
                 </div>
-                <p class="text-xs" style="color:var(--secondary)">Activity stream will appear here</p>
-                <p class="text-[10px] mt-1" style="color:var(--secondary);opacity:.5">Task updates, assignments, completions</p>
+                <p class="text-xs" style="color:var(--secondary)">No recent completions</p>
+                <p class="text-[10px] mt-1" style="color:var(--secondary);opacity:.5">Completed tasks will appear here</p>
             </div>
         @endforelse
     </div>

@@ -62,12 +62,35 @@
     </div>
 
     {{-- Priority badge --}}
-    <div class="mb-2.5">
+    <div class="mb-3">
         <span class="ts-badge"
               style="color:{{ $priorityStyle['color'] }};background:{{ $priorityStyle['bg'] }};border-color:{{ $priorityStyle['border'] }}">
             {{ $priority }}
         </span>
     </div>
+
+    {{-- Members --}}
+    @php
+        $members = $project->members ?? collect();
+        $displayMembers = $members->take(4);
+        $extraMembers = $members->count() - 4;
+    @endphp
+    @if($members->count() > 0)
+        <div class="flex items-center gap-1.5 mb-3">
+            @foreach($displayMembers as $member)
+                <div title="{{ $member->name }}">
+                    <x-workspace.avatar :user="$member" sizeClass="w-8 h-8" class="border border-[var(--surface)]" />
+                </div>
+            @endforeach
+            @if($extraMembers > 0)
+                <div class="flex items-center justify-center w-8 h-8 rounded-full border border-[var(--surface)] text-[10px] font-medium" 
+                     style="background:var(--elevated);color:var(--secondary)"
+                     title="+{{ $extraMembers }} more members">
+                    +{{ $extraMembers }}
+                </div>
+            @endif
+        </div>
+    @endif
 
     {{-- Stats --}}
     <div class="grid grid-cols-3 gap-1.5 mb-3">

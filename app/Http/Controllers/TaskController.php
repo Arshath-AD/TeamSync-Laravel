@@ -26,10 +26,10 @@ class TaskController extends Controller
      */
     public function index(Request $request)
     {
-        $tasks    = $this->taskService->getAllTasks($request);
-        $projects = \App\Models\Project::orderBy('project_name')->get();
-        $users    = \App\Models\User::orderBy('name')->get();
-        return view('tasks.index', compact('tasks', 'projects', 'users'));
+        $data = $this->taskService->getIndexData($request);
+        $data['projects'] = \App\Models\Project::orderBy('project_name')->get();
+        $data['users']    = \App\Models\User::orderBy('name')->get();
+        return view('tasks.index', $data);
     }
 
     /**
@@ -86,6 +86,10 @@ class TaskController extends Controller
     public function update(UpdateTaskRequest $request, Task $task)
     {
         $this->taskService->updateTask($task, $request->validated());
+
+        if ($request->wantsJson()) {
+            return response()->json(['success' => true, 'task' => $task]);
+        }
 
         return redirect()->route('tasks.index')
             ->with('success', 'Task updated successfully.');
